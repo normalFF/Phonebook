@@ -11,10 +11,11 @@ namespace LibraryOOP
 		private string _residence;
 		private List<PhoneNumber> _phoneNumbers;
 
-		public string Name => _name;
-		public string Surname => _surname;
-		public DateTime? DateOfBirth => _dateOfBirth;
-		public string Residence => _residence;
+		public string Name { get => _name; }
+		public string Surname { get => _surname; }
+		public DateTime? DateOfBirth { get => _dateOfBirth; }
+		public string Residence { get => _residence; }
+		public List<PhoneNumber> PhoneNumbers { get => _phoneNumbers;}
 
 		public Abonent(string name, string surname, PhoneNumber phone, DateTime? date = null, string residence = null)
 		{
@@ -36,6 +37,34 @@ namespace LibraryOOP
 			}
 
 			return phones;
+		}
+
+		public bool DeletePhone(PhoneNumber phone)
+		{
+			if (_phoneNumbers.Contains(phone))
+			{
+				_phoneNumbers.Remove(phone);
+				return true;
+			}
+			return false;
+		}
+
+		public bool AddPhone(PhoneNumber phone)
+		{
+			if (!_phoneNumbers.Contains(phone))
+			{
+				_phoneNumbers.Add(phone);
+				return true;
+			}
+			return false;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj is Abonent abonent)
+				return Equals(abonent.Name, Name) && Equals(abonent.Surname, Surname)
+					&& Equals(abonent.Residence, Residence) && Equals(abonent.DateOfBirth, DateOfBirth);
+			return false;
 		}
 
 		public override string ToString()
