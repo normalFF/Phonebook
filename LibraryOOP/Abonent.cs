@@ -5,25 +5,64 @@ namespace LibraryOOP
 {
 	public class Abonent
 	{
-		private readonly string _name;
+		private string _name;
 		private string _surname;
 		private DateTime? _dateOfBirth;
 		private string _residence;
 		private List<PhoneNumber> _phoneNumbers;
 
-		public string Name { get => _name; }
-		public string Surname { get => _surname; }
-		public DateTime? DateOfBirth { get => _dateOfBirth; }
-		public string Residence { get => _residence; }
-		public List<PhoneNumber> PhoneNumbers { get => _phoneNumbers;}
+		public string Name 
+		{ 
+			get => _name;
+			private set => _name = value;
+		}
+		public string Surname 
+		{ 
+			get => _surname;
+			private set => _surname = value;
+		}
+		public DateTime? DateOfBirth 
+		{ 
+			get => _dateOfBirth;
+			private set => _dateOfBirth = value;
+		}
+		public string Residence 
+		{ 
+			get => _residence;
+			private set => _residence = value;
+		}
+		public List<PhoneNumber> PhoneNumbers 
+		{ 
+			get => _phoneNumbers;
+			private set => _phoneNumbers = value;
+		}
+
+		public Abonent(string name, string surname, List<PhoneNumber> phones, DateTime? date = null, string residence = null)
+		{
+			if (IsNull(name, surname, phones)) throw new ArgumentNullException("Некорректные данные");
+
+			PhoneNumbers = phones;
+			Name = name;
+			Surname = surname;
+			DateOfBirth = date;
+			Residence = residence;
+		}
 
 		public Abonent(string name, string surname, PhoneNumber phone, DateTime? date = null, string residence = null)
 		{
-			_phoneNumbers = new List<PhoneNumber>() { phone };
-			_name = name;
-			_surname = surname;
-			_dateOfBirth = date;
-			_residence = residence;
+			if (IsNull(name, surname, phone)) throw new ArgumentNullException("Некорректные данные");
+
+			PhoneNumbers = new List<PhoneNumber>() { phone };
+			Name = name;
+			Surname = surname;
+			DateOfBirth = date;
+			Residence = residence;
+		}
+
+		private bool IsNull(string name, string surname, object phones)
+		{
+			if (name is null || surname is null || phones is null) return true;
+			return false;
 		}
 
 		public List<PhoneNumber> GetNumbers(PhoneType type)
@@ -35,15 +74,14 @@ namespace LibraryOOP
 				if (item.CheckTypePhone(type))
 					phones.Add(item);
 			}
-
 			return phones;
 		}
 
 		public bool DeletePhone(PhoneNumber phone)
 		{
-			if (_phoneNumbers.Contains(phone))
+			if (PhoneNumbers.Contains(phone))
 			{
-				_phoneNumbers.Remove(phone);
+				PhoneNumbers.Remove(phone);
 				return true;
 			}
 			return false;
@@ -51,9 +89,9 @@ namespace LibraryOOP
 
 		public bool AddPhone(PhoneNumber phone)
 		{
-			if (!_phoneNumbers.Contains(phone))
+			if (!PhoneNumbers.Contains(phone))
 			{
-				_phoneNumbers.Add(phone);
+				PhoneNumbers.Add(phone);
 				return true;
 			}
 			return false;
