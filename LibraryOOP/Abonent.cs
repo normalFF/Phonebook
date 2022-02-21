@@ -71,7 +71,7 @@ namespace LibraryOOP
 
 			foreach (var item in _phoneNumbers)
 			{
-				if (item.CheckTypePhone(type))
+				if (item.Type == type)
 					phones.Add(item);
 			}
 			return phones;
