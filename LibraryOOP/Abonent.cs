@@ -59,7 +59,7 @@ namespace LibraryOOP
 			Residence = residence;
 		}
 
-		private bool IsNull(string name, string surname, object phones)
+		private static bool IsNull(string name, string surname, object phones)
 		{
 			if (name is null || surname is null || phones is null) return true;
 			return false;

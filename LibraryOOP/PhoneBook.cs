@@ -77,12 +77,14 @@ namespace LibraryOOP
 		public bool AddAbonentGroup(AbonentsGroup group, Abonent abonent)
 		{
 			if (group is null || abonent is null) return false;
+			if (!AbonentsGroups.Contains(group)) return false;
 			return group.AddAbonent(abonent);
 		}
 
 		public bool AddAbonentsGroup(AbonentsGroup group, List<Abonent> abonents)
 		{
 			if (group is null || abonents is null) return false;
+			if (!AbonentsGroups.Contains(group)) return false;
 
 			foreach (var item in abonents)
 			{
