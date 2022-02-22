@@ -4,6 +4,7 @@ namespace LibraryOOP
 {
 	public class PhoneBook
 	{
+		private PhoneBook _phoneBook;
 		private List<Abonent> _abonents;
 		private List<AbonentsGroup> _abonentsGroups;
 
@@ -16,6 +17,25 @@ namespace LibraryOOP
 		{
 			get => _abonentsGroups;
 			private set => _abonentsGroups = value;
+		}
+
+		private PhoneBook()
+		{
+			Abonents = new();
+			AbonentsGroups = new();
+		}
+
+		public PhoneBook GetPhoneBook()
+		{
+			if (_phoneBook is null)
+			{
+				lock (new object())
+				{
+					if (_phoneBook is null)
+						_phoneBook = new PhoneBook();
+				}
+			}
+			return _phoneBook;
 		}
 
 		public bool AddAbonent(Abonent abonent)
