@@ -25,7 +25,7 @@
 		public override bool Equals(object obj)
 		{
 			if (obj is PhoneNumber phone)
-				return phone.Type == Type && string.Equals(phone.Phone, this.Phone);
+				return phone.Type == Type && string.Equals(phone.Phone, Phone);
 			return false;
 		}
 
