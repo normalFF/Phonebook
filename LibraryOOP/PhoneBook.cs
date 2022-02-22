@@ -48,6 +48,64 @@ namespace LibraryOOP
 			return false;
 		}
 
+		public bool CheckNameGroup(string name)
+		{
+			if (name is null) return false;
+			foreach (var item in AbonentsGroups)
+			{
+				if (item.Name.Equals(name)) return false;
+			}
+			return true;
+		}
+		
+		public bool CreateAbonentsGroup(string name, Abonent abonent)
+		{
+			if (CheckIsNull(name, abonent)) return false;
+			var group = new AbonentsGroup(name, abonent);
+			AbonentsGroups.Add(group);
+			return true;
+		}
+
+		public bool CreateAbonentsGroup(string name, List<Abonent> abonents)
+		{
+			if (CheckIsNull(name, abonents)) return false;
+			var group = new AbonentsGroup(name, abonents);
+			AbonentsGroups.Add(group);
+			return true;
+		}
+
+		public bool AddAbonentGroup(AbonentsGroup group, Abonent abonent)
+		{
+			if (group is null || abonent is null) return false;
+			return group.AddAbonent(abonent);
+		}
+
+		public bool AddAbonentsGroup(AbonentsGroup group, List<Abonent> abonents)
+		{
+			if (group is null || abonents is null) return false;
+
+			foreach (var item in abonents)
+			{
+				group.AddAbonent(item);
+			}
+			return true;
+		}
+
+		public bool RemoveGroup(AbonentsGroup group)
+		{
+			if (AbonentsGroups.Contains(group))
+			{
+				AbonentsGroups.Remove(group);
+				return true;
+			}
+			return false;
+		}
+
+		private static bool CheckIsNull(string name, object abonent)
+		{
+			return name is null || abonent is null;
+		}
+
 		public bool CheckNumberInAbonents(PhoneNumber phone)
 		{
 			foreach (var item in Abonents)
