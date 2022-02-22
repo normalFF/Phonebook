@@ -97,6 +97,16 @@ namespace LibraryOOP
 			return false;
 		}
 
+		public bool IsContainsPhone(PhoneNumber phone)
+		{
+			foreach (var item in PhoneNumbers)
+			{
+				if (item.Equals(phone))
+					return true;
+			}
+			return false;
+		}
+
 		public override bool Equals(object obj)
 		{
 			if (obj is Abonent abonent)
