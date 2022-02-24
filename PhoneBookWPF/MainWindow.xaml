@@ -88,22 +88,23 @@
                         <ScrollViewer Margin="0 0 0 5">
                             <StackPanel Margin="0 0 0 5">
                                 <Label Content="Имя Абонента"/>
-                                <TextBox/>
+                                <TextBox Text="{Binding NameCreate, UpdateSourceTrigger=PropertyChanged}"/>
                                 <Label Content="Фамилия Абонента"/>
-                                <TextBox/>
+                                <TextBox Text="{Binding SurnameCreate, UpdateSourceTrigger=PropertyChanged}"/>
                                 <Label Content="Место жительства Абонента (Необязательно)"/>
-                                <TextBox/>
+                                <TextBox Text="{Binding ResidentCreate, UpdateSourceTrigger=PropertyChanged}"/>
                                 <Label Content="Дата рождения Абонента (Необязательно)"/>
-                                <TextBox/>
+                                <TextBox Text="{Binding DateTimeCreate, UpdateSourceTrigger=PropertyChanged}"/>
                                 <Label Content="Личный телефон"/>
                                 <StackPanel>
-                                    <TextBox/>
+                                    <TextBox Text="{Binding PhoneMainAdd, UpdateSourceTrigger=PropertyChanged}"/>
                                     <Grid Margin="0 5 0 0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
-                                        <ListBox Grid.Column="0" Margin="0 0 3 0"/>
+                                        <ListBox ItemsSource="{Binding PhonesMainCreate, UpdateSourceTrigger=PropertyChanged}" 
+                                                 SelectedItem="{Binding PhoneMainSelect, UpdateSourceTrigger=PropertyChanged}" Grid.Column="0" Margin="0 0 3 0"/>
                                         <StackPanel Grid.Column="1" Margin="3 0 0 0">
                                             <Button Content="Добавить" Margin="0 0 0 5" Height="30"/>
                                             <Button Content="Удалить" Margin="0 5 0 0" Height="30"/>
@@ -112,13 +113,14 @@
                                 </StackPanel>
                                 <Label Content="Домашний телефон"/>
                                 <StackPanel>
-                                    <TextBox/>
+                                    <TextBox Text="{Binding PhoneHomeAdd, UpdateSourceTrigger=PropertyChanged}"/>
                                     <Grid Margin="0 5 0 0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
-                                        <ListBox Grid.Column="0" Margin="0 0 3 0"/>
+                                        <ListBox ItemsSource="{Binding PhonesHomeCreate, UpdateSourceTrigger=PropertyChanged}"
+                                                 SelectedItem="{Binding PhoneHomeSelect, UpdateSourceTrigger=PropertyChanged}" Grid.Column="0" Margin="0 0 3 0"/>
                                         <StackPanel Grid.Column="1" Margin="3 0 0 0">
                                             <Button Content="Добавить" Margin="0 0 0 5" Height="30"/>
                                             <Button Content="Удалить" Margin="0 5 0 0" Height="30"/>
@@ -127,13 +129,14 @@
                                 </StackPanel>
                                 <Label Content="Рабочий телефон"/>
                                 <StackPanel>
-                                    <TextBox/>
+                                    <TextBox Text="{Binding PhoneWorkAdd, UpdateSourceTrigger=PropertyChanged}"/>
                                     <Grid Margin="0 5 0 0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
-                                        <ListBox Grid.Column="0" Margin="0 0 3 0"/>
+                                        <ListBox ItemsSource="{Binding PhonesWorkCreate, UpdateSourceTrigger=PropertyChanged}"
+                                                 SelectedItem="{Binding PhoneWorkSelect, UpdateSourceTrigger=PropertyChanged}" Grid.Column="0" Margin="0 0 3 0"/>
                                         <StackPanel Grid.Column="1" Margin="3 0 0 0">
                                             <Button Content="Добавить" Margin="0 0 0 5" Height="30"/>
                                             <Button Content="Удалить" Margin="0 5 0 0" Height="30"/>
