@@ -17,7 +17,7 @@ namespace PhoneBookWPF.Models
 
 		public void OnPropertyChanged([CallerMemberName] string parameter = null)
 		{
-			PropertyChanged.Invoke(this, new PropertyChangedEventArgs(parameter));
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(parameter));
 		}
 	}
 }
