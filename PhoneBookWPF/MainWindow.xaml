@@ -3,10 +3,154 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PhoneBookWPF"
+        xmlns:local="clr-namespace:PhoneBookWPF.Models"
+        xmlns:converter="clr-namespace:PhoneBookWPF.Infrastructure.Converter"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Phone Book" Height="450" Width="900" ResizeMode="NoResize">
 
-    </Grid>
+    <Window.DataContext>
+        <local:MainViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <converter:PhoneNumberConvertorMain x:Key="ConverterMain"/>
+        <converter:PhoneNumberConvertorHome x:Key="ConverterHome"/>
+        <converter:PhoneNumberConvertorWork x:Key="ConverterWork"/>
+    </Window.Resources>
+    
+    <TabControl>
+        <TabItem Header="Список Абонентов">
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Top">
+                    <GroupBox Header="Поиск">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Имя"/>
+                            <TextBox Width="150"/>
+                            <Label Content="Фамилия"/>
+                            <TextBox Width="150"/>
+                            <Label Content="Номер телефона"/>
+                            <TextBox Width="150"/>
+                        </StackPanel>
+                    </GroupBox>
+                </DockPanel>
+                <DataGrid ItemsSource="{Binding Abonents}" SelectedItem="{Binding SelectedAbonent}" SelectionMode="Single" AutoGenerateColumns="False" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Имя" Binding="{Binding Name, TargetNullValue=Отсутствует}"/>
+                        <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname, TargetNullValue=Отсутствует}"/>
+                        <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth, TargetNullValue=Отсутствует, StringFormat=dd.mm.yyyy}"/>
+                        <DataGridTextColumn Header="Место положения" Binding="{Binding Residence, TargetNullValue=Отсутствует}"/>
+                        <DataGridTextColumn Header="Телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterMain}}"/>
+                        <DataGridTextColumn Header="Домашний телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterHome}}"/>
+                        <DataGridTextColumn Header="Рабочий телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterWork}}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </TabItem>
+        <TabItem Header="Список Групп">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <DockPanel Grid.Column="0">
+                    <DockPanel DockPanel.Dock="Top">
+                        
+                    </DockPanel>
+                    <ListBox/>
+                </DockPanel>
+
+                <DockPanel Grid.Column="1">
+                    <DockPanel DockPanel.Dock="Top">
+
+                    </DockPanel>
+                    <ListBox/>
+                </DockPanel>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Добавление Абонента">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Header="Данные Абонента">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Bottom">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Button Content="Добавить" Grid.Column="0" Margin="0 0 5 0" Height="30"/>
+                                <Button Content="Очистить" Grid.Column="1" Margin="5 0 0 0" Height="30"/>
+                            </Grid>
+                        </DockPanel>
+                        <ScrollViewer Margin="0 0 0 5">
+                            <StackPanel Margin="0 0 0 5">
+                                <Label Content="Имя Абонента"/>
+                                <TextBox/>
+                                <Label Content="Фамилия Абонента"/>
+                                <TextBox/>
+                                <Label Content="Место жительства Абонента (Необязательно)"/>
+                                <TextBox/>
+                                <Label Content="Дата рождения Абонента (Необязательно)"/>
+                                <TextBox/>
+                                <Label Content="Личный телефон"/>
+                                <StackPanel>
+                                    <TextBox/>
+                                    <Grid Margin="0 5 0 0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <ListBox Grid.Column="0" Margin="0 0 3 0"/>
+                                        <StackPanel Grid.Column="1" Margin="3 0 0 0">
+                                            <Button Content="Добавить" Margin="0 0 0 5" Height="30"/>
+                                            <Button Content="Удалить" Margin="0 5 0 0" Height="30"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                                <Label Content="Домашний телефон"/>
+                                <StackPanel>
+                                    <TextBox/>
+                                    <Grid Margin="0 5 0 0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <ListBox Grid.Column="0" Margin="0 0 3 0"/>
+                                        <StackPanel Grid.Column="1" Margin="3 0 0 0">
+                                            <Button Content="Добавить" Margin="0 0 0 5" Height="30"/>
+                                            <Button Content="Удалить" Margin="0 5 0 0" Height="30"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                                <Label Content="Рабочий телефон"/>
+                                <StackPanel>
+                                    <TextBox/>
+                                    <Grid Margin="0 5 0 0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <ListBox Grid.Column="0" Margin="0 0 3 0"/>
+                                        <StackPanel Grid.Column="1" Margin="3 0 0 0">
+                                            <Button Content="Добавить" Margin="0 0 0 5" Height="30"/>
+                                            <Button Content="Удалить" Margin="0 5 0 0" Height="30"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+                </GroupBox>
+                <GroupBox Grid.Column="1" Header="Группы, в которых состоит абонент">
+                    <ListBox/>
+                </GroupBox>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Добавление группы">
+            
+        </TabItem>
+    </TabControl>
 </Window>
