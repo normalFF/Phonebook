@@ -5,37 +5,11 @@ namespace LibraryOOP
 {
 	public class Abonent
 	{
-		private string _name;
-		private string _surname;
-		private DateTime? _dateOfBirth;
-		private string _residence;
-		private List<PhoneNumber> _phoneNumbers;
-
-		public string Name 
-		{ 
-			get => _name;
-			private set => _name = value;
-		}
-		public string Surname 
-		{ 
-			get => _surname;
-			private set => _surname = value;
-		}
-		public DateTime? DateOfBirth 
-		{ 
-			get => _dateOfBirth;
-			private set => _dateOfBirth = value;
-		}
-		public string Residence 
-		{ 
-			get => _residence;
-			private set => _residence = value;
-		}
-		public List<PhoneNumber> PhoneNumbers 
-		{ 
-			get => _phoneNumbers;
-			private set => _phoneNumbers = value;
-		}
+		public string Name { get; private set; }
+		public string Surname { get; private set; }
+		public DateTime? DateOfBirth { get; private set; }
+		public string Residence { get; private set; }
+		public List<PhoneNumber> PhoneNumbers { get; private set; }
 
 		public Abonent(string name, string surname, List<PhoneNumber> phones, DateTime? date = null, string residence = null)
 		{
@@ -69,7 +43,7 @@ namespace LibraryOOP
 		{
 			List<PhoneNumber> phones = new();
 
-			foreach (var item in _phoneNumbers)
+			foreach (var item in PhoneNumbers)
 			{
 				if (item.Type == type)
 					phones.Add(item);
@@ -122,9 +96,9 @@ namespace LibraryOOP
 			if (!(DateOfBirth is null)) returnResult += $"\n{DateOfBirth}";
 			if (!(Residence is null)) returnResult += $"\n{Residence}";
 
-			foreach (var item in _phoneNumbers)
+			foreach (var item in PhoneNumbers)
 			{
-				returnResult += $"{item.Type} {item.Phone}";
+				returnResult += $"\n{item.Type} {item.Phone}";
 			}
 
 			return returnResult;

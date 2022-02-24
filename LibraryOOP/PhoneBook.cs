@@ -4,20 +4,10 @@ namespace LibraryOOP
 {
 	public class PhoneBook
 	{
-		private PhoneBook _phoneBook;
-		private List<Abonent> _abonents;
-		private List<AbonentsGroup> _abonentsGroups;
+		private static PhoneBook _phoneBook;
 
-		public List<Abonent> Abonents
-		{
-			get => _abonents;
-			private set => _abonents = value;
-		}
-		public List<AbonentsGroup> AbonentsGroups
-		{
-			get => _abonentsGroups;
-			private set => _abonentsGroups = value;
-		}
+		public List<Abonent> Abonents { get; private set; }
+		public List<AbonentsGroup> AbonentsGroups { get; private set; }
 
 		private PhoneBook()
 		{
@@ -25,7 +15,7 @@ namespace LibraryOOP
 			AbonentsGroups = new();
 		}
 
-		public PhoneBook GetPhoneBook()
+		public static PhoneBook GetPhoneBook()
 		{
 			if (_phoneBook is null)
 			{

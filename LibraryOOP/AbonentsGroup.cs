@@ -5,20 +5,8 @@ namespace LibraryOOP
 {
 	public class AbonentsGroup
 	{
-		private string _name;
-		private List<Abonent> _abonents;
-
-		public string Name
-		{
-			get => _name;
-			private set => _name = value;
-		}
-
-		public List<Abonent> Abonents
-		{
-			get => _abonents;
-			private set => _abonents = value;
-		}
+		public string Name { get; private set; }
+		public List<Abonent> Abonents { get; private set; }
 
 		public AbonentsGroup(string name, List<Abonent> abonents)
 		{
