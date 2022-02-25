@@ -49,7 +49,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
 
                 <DockPanel Grid.Column="0">
@@ -81,8 +81,8 @@
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Button Content="Добавить" Grid.Column="0" Margin="0 0 5 0" Height="30"/>
-                                <Button Content="Очистить" Grid.Column="1" Margin="5 0 0 0" Height="30"/>
+                                <Button Content="Добавить" Grid.Column="0" Margin="0 0 5 0" Height="30" Command="{Binding AddAbonentCommand}"/>
+                                <Button Content="Очистить" Grid.Column="1" Margin="5 0 0 0" Height="30" Command="{Binding ClearAbonentCommand}"/>
                             </Grid>
                         </DockPanel>
                         <ScrollViewer Margin="0 0 0 5">
@@ -94,7 +94,7 @@
                                 <Label Content="Место жительства Абонента (Необязательно)"/>
                                 <TextBox Text="{Binding ResidentCreate, UpdateSourceTrigger=PropertyChanged}"/>
                                 <Label Content="Дата рождения Абонента (Необязательно)"/>
-                                <TextBox Text="{Binding DateTimeCreate, UpdateSourceTrigger=PropertyChanged}"/>
+                                <DatePicker SelectedDate="{Binding DateTimeCreate, UpdateSourceTrigger=PropertyChanged}"/>
                                 <Label Content="Личный телефон"/>
                                 <StackPanel>
                                     <TextBox Text="{Binding PhoneMainAdd, UpdateSourceTrigger=PropertyChanged}"/>
@@ -104,10 +104,16 @@
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
                                         <ListBox ItemsSource="{Binding PhonesMainCreate, UpdateSourceTrigger=PropertyChanged}" 
-                                                 SelectedItem="{Binding PhoneMainSelect, UpdateSourceTrigger=PropertyChanged}" Grid.Column="0" Margin="0 0 3 0"/>
+                                                 SelectedItem="{Binding PhoneMainSelect, UpdateSourceTrigger=PropertyChanged}" Grid.Column="0" Margin="0 0 3 0" Height="70">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Phone}"/>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
                                         <StackPanel Grid.Column="1" Margin="3 0 0 0">
-                                            <Button Content="Добавить" Margin="0 0 0 5" Height="30"/>
-                                            <Button Content="Удалить" Margin="0 5 0 0" Height="30"/>
+                                            <Button Content="Добавить" Margin="0 0 0 5" Height="30" Command="{Binding AddPhoneMainCommand}"/>
+                                            <Button Content="Удалить" Margin="0 5 0 0" Height="30" Command="{Binding DeletePhoneMainCommand}"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -122,7 +128,7 @@
                                         <ListBox ItemsSource="{Binding PhonesHomeCreate, UpdateSourceTrigger=PropertyChanged}"
                                                  SelectedItem="{Binding PhoneHomeSelect, UpdateSourceTrigger=PropertyChanged}" Grid.Column="0" Margin="0 0 3 0"/>
                                         <StackPanel Grid.Column="1" Margin="3 0 0 0">
-                                            <Button Content="Добавить" Margin="0 0 0 5" Height="30"/>
+                                            <Button Content="Добавить" Margin="0 0 0 5" Height="30" Command="{Binding AddPhoneHomeCommand}"/>
                                             <Button Content="Удалить" Margin="0 5 0 0" Height="30"/>
                                         </StackPanel>
                                     </Grid>
