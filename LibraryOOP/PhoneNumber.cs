@@ -2,26 +2,17 @@
 
 namespace LibraryOOP
 {
-	public enum PhoneType { Рабочий, Домашний, Личный}
+	public enum PhoneType { Рабочий, Домашний, Личный }
 
-	public struct PhoneNumber
+	public class PhoneNumber
 	{
-		private PhoneType _type;
-		private string _phone;
-
-		public PhoneType Type
-		{
-			get => _type;
-		}
-		public string Phone
-		{
-			get => _phone;
-		}
+		public PhoneType Type { get; private set; }
+		public string Phone { get; private set; }
 
 		public PhoneNumber(string phone, PhoneType type)
 		{
-			_type = type;
-			_phone = phone;
+			Type = type;
+			Phone = phone;
 		}
 
 		public override bool Equals(object obj)
@@ -31,19 +22,18 @@ namespace LibraryOOP
 			return false;
 		}
 
-		public static bool operator ==(PhoneNumber phone1, PhoneNumber phone2)
-		{
-			return phone1.Equals(phone2);
-		}
-
-		public static bool operator !=(PhoneNumber phone1, PhoneNumber phone2)
-		{
-			return !phone1.Equals(phone2);
-		}
-
 		public override int GetHashCode()
 		{
-			throw new NotImplementedException("Метод не реализован");
+			int result = 0;
+			int count = 0;
+
+			foreach (var item in Phone)
+			{
+				if (item != ')' && item != '(' && item != '-')
+					result += (int)Math.Pow(Convert.ToInt32(item), 2 + count);
+			}
+
+			return result;
 		}
 
 		public override string ToString()
