@@ -121,6 +121,9 @@ namespace PhoneBookWPF.Models
 		public ICommand AddPhoneMainCommand { get; private set; }
 		public ICommand DeletePhoneMainCommand { get; private set; }
 		public ICommand AddPhoneHomeCommand { get; private set; }
+		public ICommand DeletePhoneHomeCommand { get; private set; }
+		public ICommand AddPhoneWorkCommand { get; private set; }
+		public ICommand DeletePhoneWorkCommand { get; private set; }
 
 		public MainViewModel()
 		{
@@ -147,6 +150,9 @@ namespace PhoneBookWPF.Models
 			AddPhoneMainCommand = new CommandBase(OnAddPhoneMain, CanAddPhoneMain);
 			DeletePhoneMainCommand = new CommandBase(OnDeletePhoneMain, CanDeletePhoneMain);
 			AddPhoneHomeCommand = new CommandBase(OnAddPhoneHome, CanAddPhoneHome);
+			DeletePhoneHomeCommand = new CommandBase(OnDeletePhoneHome, CanDeletePhoneHome);
+			AddPhoneWorkCommand = new CommandBase(OnAddPhoneWork, CanAddPhoneWork);
+			DeletePhoneWorkCommand = new CommandBase(OnDeletePhoneWork, CanDeletePhoneWork);
 		}
 
 		private bool CanCreateAbonent(object obj)
@@ -208,7 +214,41 @@ namespace PhoneBookWPF.Models
 
 		private void OnAddPhoneHome(object obj)
 		{
+			PhoneNumber phone = new(PhoneHomeAdd, PhoneType.Личный);
+			PhonesHomeCreate.Add(phone);
+		}
 
+		private bool CanDeletePhoneHome(object obj)
+		{
+			return PhoneHomeSelect != null;
+		}
+
+		private void OnDeletePhoneHome(object obj)
+		{
+			PhonesHomeCreate.Remove(PhoneHomeSelect);
+			PhoneHomeSelect = null;
+		}
+
+		private bool CanDeletePhoneWork(object arg)
+		{
+			return PhoneWorkSelect != null;
+		}
+
+		private void OnDeletePhoneWork(object obj)
+		{
+			PhonesWorkCreate.Remove(PhoneWorkSelect);
+			PhoneWorkSelect = null;
+		}
+
+		private bool CanAddPhoneWork(object arg)
+		{
+			return PhoneWorkAdd != null && PhoneWorkAdd.Length > 0;
+		}
+
+		private void OnAddPhoneWork(object obj)
+		{
+			PhoneNumber phone = new(PhoneWorkAdd, PhoneType.Личный);
+			PhonesWorkCreate.Add(phone);
 		}
 	}
 }
