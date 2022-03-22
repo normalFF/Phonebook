@@ -1,38 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace LibraryOOP
 {
 	public class AbonentsGroup
 	{
+		private List<Abonent> _abonents { get; set; }
+
 		public string Name { get; private set; }
-		public List<Abonent> Abonents { get; private set; }
+		public ReadOnlyCollection<Abonent> Abonents { get; }
 
-		public AbonentsGroup(string name, List<Abonent> abonents)
+		internal AbonentsGroup(string name, List<Abonent> abonents)
 		{
-			if (!IsNull(name, abonents)) throw new ArgumentNullException("Некорректные данные");
+			IsNull(name, abonents);
 			Name = name;
-			Abonents = abonents;
+			_abonents = abonents;
+			Abonents = _abonents.AsReadOnly();
 		}
 
-		public AbonentsGroup(string name, Abonent abonent)
+		internal AbonentsGroup(string name, Abonent abonent)
 		{
-			if (!IsNull(name, abonent)) throw new ArgumentNullException("Некорректные данные");
+			IsNull(name, Abonents);
 			Name = name;
-			Abonents = new() { abonent };
+			_abonents = new() { abonent };
+			Abonents = _abonents.AsReadOnly();
 		}
 
-		private static bool IsNull(string name, object abonents)
+		private static void IsNull(string name, object abonents)
 		{
-			if (name is null || abonents is null) return false;
-			return true;
+			if (name == null) throw new ArgumentNullException($"{nameof(name)} является {name}");
+			if (abonents == null) throw new ArgumentNullException($"{nameof(abonents)} является {abonents}");
+			if (abonents is List<Abonent> abonent)
+			{
+				if (abonent.Count == 0) throw new ArgumentException($"{abonent} не может содержать {abonent.Count} элементов");
+				foreach (var item in abonent)
+				{
+					if (item == null) throw new AggregateException($"Элемент {nameof(item)} в {abonent} не может быть {item}");
+				}
+			}
 		}
 
 		public bool AddAbonent(Abonent abonent)
 		{
-			if (!Abonents.Contains(abonent))
+			if (abonent == null) return false;
+
+			if (!_abonents.Contains(abonent))
 			{
-				Abonents.Add(abonent);
+				_abonents.Add(abonent);
 				return true;
 			}
 			return false;
@@ -40,9 +55,11 @@ namespace LibraryOOP
 
 		public bool RemoveAbonent(Abonent abonent)
 		{
-			if (Abonents.Contains(abonent))
+			if (abonent == null) return false;
+
+			if (_abonents.Contains(abonent))
 			{
-				Abonents.Remove(abonent);
+				_abonents.Remove(abonent);
 				return true;
 			}
 			return false;

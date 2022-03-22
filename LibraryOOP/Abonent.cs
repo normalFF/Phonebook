@@ -1,42 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace LibraryOOP
 {
 	public class Abonent
 	{
+		private List<PhoneNumber> _phoneNumbers { get; set; }
+
 		public string Name { get; private set; }
 		public string Surname { get; private set; }
 		public DateTime? DateOfBirth { get; private set; }
 		public string Residence { get; private set; }
-		public List<PhoneNumber> PhoneNumbers { get; private set; }
+		public ReadOnlyCollection<PhoneNumber> PhoneNumbers;
 
-		public Abonent(string name, string surname, List<PhoneNumber> phones, DateTime? date = null, string residence = null)
+		internal Abonent(string name, string surname, List<PhoneNumber> phones, DateTime? date = null, string residence = null)
 		{
-			if (IsNull(name, surname, phones)) throw new ArgumentNullException("Некорректные данные");
+			IsCorrect(name, surname);
 
-			PhoneNumbers = phones;
+			_phoneNumbers = phones;
+			PhoneNumbers = phones.AsReadOnly();
 			Name = name;
 			Surname = surname;
 			DateOfBirth = date;
 			Residence = residence;
 		}
 
-		public Abonent(string name, string surname, PhoneNumber phone, DateTime? date = null, string residence = null)
+		private static void IsCorrect(string name, string surname)
 		{
-			if (IsNull(name, surname, phone)) throw new ArgumentNullException("Некорректные данные");
-
-			PhoneNumbers = new List<PhoneNumber>() { phone };
-			Name = name;
-			Surname = surname;
-			DateOfBirth = date;
-			Residence = residence;
-		}
-
-		private static bool IsNull(string name, string surname, object phones)
-		{
-			if (name is null || surname is null || phones is null) return true;
-			return false;
+			if (name == null) throw new ArgumentNullException($"{nameof(name)} не может быть {name}");
+			if (surname == null) throw new ArgumentNullException($"{nameof(surname)} не может быть {surname}");
 		}
 
 		public List<PhoneNumber> GetNumbers(PhoneType type)
@@ -53,9 +46,11 @@ namespace LibraryOOP
 
 		public bool DeletePhone(PhoneNumber phone)
 		{
+			if (phone == null) return false;
+
 			if (PhoneNumbers.Contains(phone))
 			{
-				PhoneNumbers.Remove(phone);
+				_phoneNumbers.Remove(phone);
 				return true;
 			}
 			return false;
@@ -63,9 +58,11 @@ namespace LibraryOOP
 
 		public bool AddPhone(PhoneNumber phone)
 		{
+			if (phone == null) return false;
+
 			if (!PhoneNumbers.Contains(phone))
 			{
-				PhoneNumbers.Add(phone);
+				_phoneNumbers.Add(phone);
 				return true;
 			}
 			return false;
@@ -73,10 +70,14 @@ namespace LibraryOOP
 
 		public bool IsContainsPhone(PhoneNumber phone)
 		{
+			if (phone == null) return false;
+
 			foreach (var item in PhoneNumbers)
 			{
 				if (item.Equals(phone))
+				{
 					return true;
+				}
 			}
 			return false;
 		}
@@ -102,6 +103,11 @@ namespace LibraryOOP
 			}
 
 			return returnResult;
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
 		}
 	}
 }

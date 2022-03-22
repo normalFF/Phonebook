@@ -9,10 +9,16 @@ namespace LibraryOOP
 		public PhoneType Type { get; private set; }
 		public string Phone { get; private set; }
 
-		public PhoneNumber(string phone, PhoneType type)
+		internal PhoneNumber(string phone, PhoneType type)
 		{
+			if (!IsCorrectPhone(phone)) throw new ArgumentException($"{phone} содержит некорректное значение");
 			Type = type;
 			Phone = phone;
+		}
+
+		public static bool IsCorrectPhone(string phone)
+		{
+			return true;
 		}
 
 		public override bool Equals(object obj)
