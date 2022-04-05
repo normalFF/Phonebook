@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PhoneBookWPF.Models"
         xmlns:converter="clr-namespace:PhoneBookWPF.Infrastructure.Converter"
         mc:Ignorable="d"
-        Title="Phone Book" Height="450" Width="900" ResizeMode="NoResize">
+        Title="Phone Book" Height="500" Width="900" ResizeMode="NoResize">
 
     <Window.DataContext>
         <local:MainViewModel/>
@@ -73,6 +73,11 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                
                 <GroupBox Header="Данные Абонента">
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Bottom">
@@ -165,9 +170,10 @@
                         </ScrollViewer>
                     </DockPanel>
                 </GroupBox>
-                <GroupBox Grid.Column="1" Header="Группы, в которых состоит абонент">
+                <GroupBox Grid.Column="1" Grid.Row="0" Header="Группы, в которых состоит абонент">
                     <ListBox/>
                 </GroupBox>
+                
             </Grid>
         </TabItem>
         <TabItem Header="Добавление группы">
