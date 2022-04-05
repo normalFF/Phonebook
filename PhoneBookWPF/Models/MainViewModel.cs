@@ -10,8 +10,8 @@ namespace PhoneBookWPF.Models
 	internal class MainViewModel : BaseViewModel
 	{
 		private readonly PhoneBook _phoneBook;
-		private List<Abonent> _abonents;
-		private List<AbonentsGroup> _abonentsGroups;
+		private IEnumerable<Abonent> _abonents;
+		private IEnumerable<AbonentsGroup> _abonentsGroups;
 		private Abonent _selectedAbonent;
 		private AbonentsGroup _selectedAbonentsGroup;
 
@@ -29,12 +29,12 @@ namespace PhoneBookWPF.Models
 		private string _phoneWorkAdd;
 		private PhoneNumber _phoneWorkSelect;
 
-		public List<Abonent> Abonents
+		public IEnumerable<Abonent> Abonents
 		{
 			get => _abonents;
 			set => Set(ref _abonents, value);
 		}
-		public List<AbonentsGroup> AbonentsGroups
+		public IEnumerable<AbonentsGroup> AbonentsGroups
 		{
 			get => _abonentsGroups;
 			set => Set(ref _abonentsGroups, value);
@@ -130,7 +130,7 @@ namespace PhoneBookWPF.Models
 			_phoneBook = PhoneBook.GetPhoneBook();
 			GetData.GetListAbonents(_phoneBook, 20);
 			Abonents = _phoneBook.Abonents;
-			AbonentsGroups = _phoneBook.AbonentsGroups;
+			AbonentsGroups = _phoneBook.AbonentsGroup;
 
 			CommandInitialization();
 			ObjectInitialization();
@@ -192,8 +192,7 @@ namespace PhoneBookWPF.Models
 
 		private void OnAddPhoneMain(object obj)
 		{
-			PhoneNumber phone = new(PhoneMainAdd, PhoneType.Личный);
-			PhonesMainCreate.Add(phone);
+			
 		}
 
 		private bool CanDeletePhoneMain(object obj)
@@ -214,8 +213,10 @@ namespace PhoneBookWPF.Models
 
 		private void OnAddPhoneHome(object obj)
 		{
+			/*
 			PhoneNumber phone = new(PhoneHomeAdd, PhoneType.Личный);
 			PhonesHomeCreate.Add(phone);
+			*/
 		}
 
 		private bool CanDeletePhoneHome(object obj)
@@ -247,8 +248,10 @@ namespace PhoneBookWPF.Models
 
 		private void OnAddPhoneWork(object obj)
 		{
+			/*
 			PhoneNumber phone = new(PhoneWorkAdd, PhoneType.Личный);
 			PhonesWorkCreate.Add(phone);
+			*/
 		}
 	}
 }
