@@ -8,21 +8,28 @@ namespace PhoneBookWPF
 	{
 		public static void GetListAbonents(PhoneBook phoneBook, int count)
 		{
-			Faker faker = new Faker("ru");
+			phoneBook = PhoneBook.GetPhoneBook();
+
+			Faker faker = new("ru");
 			Random rn = new();
 
-			for (int i = 0; i < count; i++)
+			for (int i = 0; i < 15; i++)
 			{
-				PhoneNumber phoneNumber = new PhoneNumber(faker.Phone.PhoneNumber(), (PhoneType)rn.Next(0, 3));
+				var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), (PhoneType)rn.Next(0, 3));
 				var gender = faker.Person.Gender;
-				Abonent abonent = new Abonent(faker.Name.FirstName(gender), faker.Name.LastName(gender), phoneNumber, DateTime.Now);
+				phoneBook.AddAbonent(faker.Name.FirstName(gender), faker.Name.LastName(gender), phone, DateTime.Now);
+			}
+
+			var abonents = phoneBook.Abonents;
+
+			foreach (var item in abonents)
+			{
 				int num = rn.Next(1, 3);
 				for (int j = 0; j < num; j++)
 				{
-					phoneNumber = new PhoneNumber(faker.Phone.PhoneNumber(), (PhoneType)rn.Next(0, 3));
-					abonent.AddPhone(phoneNumber);
+					var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), (PhoneType)rn.Next(0, 3));
+					phoneBook.AddAbonentPhone(item, phone);
 				}
-				phoneBook.AddAbonent(abonent);
 			}
 		}
 	}
