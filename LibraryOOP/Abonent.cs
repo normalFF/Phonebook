@@ -12,14 +12,13 @@ namespace LibraryOOP
 		public string Surname { get; private set; }
 		public DateTime? DateOfBirth { get; private set; }
 		public string Residence { get; private set; }
-		public ReadOnlyCollection<PhoneNumber> PhoneNumbers;
+		public IEnumerable<PhoneNumber> PhoneNumbers { get => _phoneNumbers; }
 
 		internal Abonent(string name, string surname, List<PhoneNumber> phones, DateTime? date = null, string residence = null)
 		{
 			IsCorrect(name, surname);
 
 			_phoneNumbers = phones;
-			PhoneNumbers = phones.AsReadOnly();
 			Name = name;
 			Surname = surname;
 			DateOfBirth = date;
@@ -32,11 +31,11 @@ namespace LibraryOOP
 			if (surname == null) throw new ArgumentNullException($"{nameof(surname)} не может быть {surname}");
 		}
 
-		public List<PhoneNumber> GetNumbers(PhoneType type)
+		public IEnumerable<PhoneNumber> GetNumbers(PhoneType type)
 		{
 			List<PhoneNumber> phones = new();
 
-			foreach (var item in PhoneNumbers)
+			foreach (var item in _phoneNumbers)
 			{
 				if (item.Type == type)
 					phones.Add(item);
@@ -44,11 +43,11 @@ namespace LibraryOOP
 			return phones;
 		}
 
-		public bool DeletePhone(PhoneNumber phone)
+		internal bool DeletePhone(PhoneNumber phone)
 		{
 			if (phone == null) return false;
 
-			if (PhoneNumbers.Contains(phone))
+			if (_phoneNumbers.Contains(phone))
 			{
 				_phoneNumbers.Remove(phone);
 				return true;
@@ -56,11 +55,11 @@ namespace LibraryOOP
 			return false;
 		}
 
-		public bool AddPhone(PhoneNumber phone)
+		internal bool AddPhone(PhoneNumber phone)
 		{
 			if (phone == null) return false;
 
-			if (!PhoneNumbers.Contains(phone))
+			if (!_phoneNumbers.Contains(phone))
 			{
 				_phoneNumbers.Add(phone);
 				return true;
@@ -72,7 +71,7 @@ namespace LibraryOOP
 		{
 			if (phone == null) return false;
 
-			foreach (var item in PhoneNumbers)
+			foreach (var item in _phoneNumbers)
 			{
 				if (item.Equals(phone))
 				{
@@ -97,7 +96,7 @@ namespace LibraryOOP
 			if (!(DateOfBirth is null)) returnResult += $"\n{DateOfBirth}";
 			if (!(Residence is null)) returnResult += $"\n{Residence}";
 
-			foreach (var item in PhoneNumbers)
+			foreach (var item in _phoneNumbers)
 			{
 				returnResult += $"\n{item.Type} {item.Phone}";
 			}

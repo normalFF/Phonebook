@@ -10,15 +10,16 @@ namespace LibraryOOP
 		private List<Abonent> _abonents { get; set; }
 		private List<AbonentsGroup> _abonentsGroups { get; set; }
 		
-		public ReadOnlyCollection<Abonent> Abonents { get; }
-		public ReadOnlyCollection<AbonentsGroup> AbonentsGroup { get; }
+		public IEnumerable<Abonent> Abonents { get => _abonents; }
+		public IEnumerable<AbonentsGroup> AbonentsGroup { get => _abonentsGroups; }
+
+		public int AbonentCount { get => _abonents.Count; }
+		public int AbonentsGroupCount { get => _abonentsGroups.Count; }
 
 		private PhoneBook()
 		{
 			_abonents = new();
 			_abonentsGroups = new();
-			Abonents = _abonents.AsReadOnly();
-			AbonentsGroup = _abonentsGroups.AsReadOnly();
 		}
 
 		public static PhoneBook GetPhoneBook()
@@ -34,9 +35,24 @@ namespace LibraryOOP
 			return _phoneBook;
 		}
 
+		public static PhoneNumber CreatePhoneNumber(string phone, PhoneType phoneType)
+		{
+			return PhoneNumber.CreatePhoneNumber(phone, phoneType);
+		}
+
+		private static bool CheckIsNull(string name, object abonent)
+		{
+			return name is null || abonent is null;
+		}
+
 
 		public bool AddAbonent(string name, string surname, List<PhoneNumber> phones, DateTime? date = null, string residence = null)
 		{
+			foreach (var item in phones)
+			{
+				if (item == null) return false;
+			}
+
 			Abonent newAbonent = new(name, surname, phones, date, residence);
 			
 			if (!_abonents.Contains(newAbonent))
@@ -49,6 +65,7 @@ namespace LibraryOOP
 
 		public bool AddAbonent(string name, string surname, PhoneNumber phone, DateTime? date = null, string residence = null)
 		{
+			if (phone == null) return false;
 			return AddAbonent(name, surname, new List<PhoneNumber>() { phone }, date, residence);
 		}
 
@@ -68,6 +85,7 @@ namespace LibraryOOP
 			return true;
 		}
 
+
 		public bool CreateAbonentsGroup(string name, Abonent abonent)
 		{
 			return CreateAbonentsGroup(name, new List<Abonent>() { abonent });
@@ -81,25 +99,38 @@ namespace LibraryOOP
 			return true;
 		}
 
-		public static PhoneNumber CreatePhoneNumber(string phone, PhoneType phoneType)
+
+		public bool AddAbonentPhone(Abonent abonent, PhoneNumber phone)
 		{
-			if (PhoneNumber.IsCorrectPhone(phone))
+			if (phone == null) return false;
+			if (abonent.IsContainsPhone(phone)) return false;
+			else
 			{
-				return new PhoneNumber(phone, phoneType);
+				abonent.AddPhone(phone);
+				return true;
 			}
-			return null;
 		}
 
+		public bool RemoveAbonentPhone(Abonent abonent, PhoneNumber phone)
+		{
+			if (abonent.IsContainsPhone(phone)) return false;
+			else
+			{
+				abonent.DeletePhone(phone);
+				return true;
+			}
+		}
 
 		public bool RemoveAbonent(Abonent abonent)
 		{
 			if (_abonents.Contains(abonent))
 			{
-				_abonents.Remove(abonent);
 				foreach (var item in _abonentsGroups)
 				{
 					item.RemoveAbonent(abonent);
 				}
+				_abonents.Remove(abonent);
+
 				return true;
 			}
 			return false;
@@ -124,21 +155,6 @@ namespace LibraryOOP
 				if (item.Name.Equals(name)) return false;
 			}
 			return true;
-		}
-
-		private static bool CheckIsNull(string name, object abonent)
-		{
-			return name is null || abonent is null;
-		}
-
-		public bool CheckNumberInAbonents(PhoneNumber phone)
-		{
-			foreach (var item in Abonents)
-			{
-				if (item.IsContainsPhone(phone))
-					return true;
-			}
-			return false;
 		}
 	}
 }

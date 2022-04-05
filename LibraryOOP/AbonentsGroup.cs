@@ -9,14 +9,13 @@ namespace LibraryOOP
 		private List<Abonent> _abonents { get; set; }
 
 		public string Name { get; private set; }
-		public ReadOnlyCollection<Abonent> Abonents { get; }
+		public IEnumerable<Abonent> Abonents { get => _abonents; }
 
 		internal AbonentsGroup(string name, List<Abonent> abonents)
 		{
 			IsNull(name, abonents);
 			Name = name;
 			_abonents = abonents;
-			Abonents = _abonents.AsReadOnly();
 		}
 
 		internal AbonentsGroup(string name, Abonent abonent)
@@ -24,7 +23,6 @@ namespace LibraryOOP
 			IsNull(name, Abonents);
 			Name = name;
 			_abonents = new() { abonent };
-			Abonents = _abonents.AsReadOnly();
 		}
 
 		private static void IsNull(string name, object abonents)
@@ -41,7 +39,7 @@ namespace LibraryOOP
 			}
 		}
 
-		public bool AddAbonent(Abonent abonent)
+		internal bool AddAbonent(Abonent abonent)
 		{
 			if (abonent == null) return false;
 
@@ -53,7 +51,7 @@ namespace LibraryOOP
 			return false;
 		}
 
-		public bool RemoveAbonent(Abonent abonent)
+		internal bool RemoveAbonent(Abonent abonent)
 		{
 			if (abonent == null) return false;
 
