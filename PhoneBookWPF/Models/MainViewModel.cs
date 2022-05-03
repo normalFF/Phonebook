@@ -2,18 +2,87 @@
 using LibraryOOP;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using PhoneBookWPF.Command;
 using System.Windows.Input;
+using System.Windows;
+using System.Linq;
 
 namespace PhoneBookWPF.Models
 {
-	internal class MainViewModel : BaseViewModel
+	internal partial class MainViewModel : BaseViewModel
 	{
+		//-----------------------------------------------
 		private readonly PhoneBook _phoneBook;
 		private IEnumerable<Abonent> _abonents;
 		private IEnumerable<AbonentsGroup> _abonentsGroups;
+		private string _selectedGroupName;
+		private List<Abonent> _selectedGoupList;
 		private Abonent _selectedAbonent;
-		private AbonentsGroup _selectedAbonentsGroup;
+
+		public IEnumerable<Abonent> Abonents
+		{
+			get => _abonents;
+			set => Set(ref _abonents, value);
+		}
+		public IEnumerable<AbonentsGroup> AbonentsGroups
+		{
+			get => _abonentsGroups;
+			set => Set(ref _abonentsGroups, value);
+		}
+		public string SelectedGroupName
+		{
+			get => _selectedGroupName;
+			set
+			{
+				if (Set(ref _selectedGroupName, value))
+				{
+					foreach (var item in AbonentsGroups)
+					{
+						if (string.Equals(item.Name, SelectedGroupName))
+							SelectedGoupList = item.Abonents.ToList();
+					}
+				}
+			}
+		}
+		public List<Abonent> SelectedGoupList
+		{
+			get => _selectedGoupList;
+			set => Set(ref _selectedGoupList, value);
+		}
+		public Abonent SelectedAbonent
+		{
+			get => _selectedAbonent;
+			set => Set(ref _selectedAbonent, value);
+		}
+
+		//----------------------------------------------
+
+		private ObservableCollection<string> _allNamesGroups;
+		private string _selectedAllGroupName;
+		private ObservableCollection<string> _selectedNamesGroups;
+		private string _selectedNameGroup;
+
+		public ObservableCollection<string> AllNamesGroups
+		{
+			get => _allNamesGroups;
+			set => Set(ref _allNamesGroups, value);
+		}
+		public string SelectedAllGroupName
+		{
+			get => _selectedAllGroupName;
+			set => Set(ref _selectedAllGroupName, value);
+		}
+		public ObservableCollection<string> SelectedNamesGroups
+		{
+			get => _selectedNamesGroups;
+			set => Set(ref _selectedNamesGroups, value);
+		}
+		public string SelectedNameGroup
+		{
+			get => _selectedNameGroup;
+			set => Set(ref _selectedNameGroup, value);
+		}
+
+		//----------------------------------------------
 
 		private string _nameCreate;
 		private string _surnameCreate;
@@ -28,27 +97,6 @@ namespace PhoneBookWPF.Models
 		private ObservableCollection<PhoneNumber> _phonesWorkCreate;
 		private string _phoneWorkAdd;
 		private PhoneNumber _phoneWorkSelect;
-
-		public IEnumerable<Abonent> Abonents
-		{
-			get => _abonents;
-			set => Set(ref _abonents, value);
-		}
-		public IEnumerable<AbonentsGroup> AbonentsGroups
-		{
-			get => _abonentsGroups;
-			set => Set(ref _abonentsGroups, value);
-		}
-		public Abonent SelectedAbonent
-		{
-			get => _selectedAbonent;
-			set => Set(ref _selectedAbonent, value);
-		}
-		public AbonentsGroup SelectedAbonentsGroup
-		{
-			get => _selectedAbonentsGroup;
-			set => Set(ref _selectedAbonentsGroup, value);
-		}
 
 		public string NameCreate
 		{
@@ -68,7 +116,18 @@ namespace PhoneBookWPF.Models
 		public DateTime? DateTimeCreate
 		{
 			get => _dateTimeCreate;
-			set => Set(ref _dateTimeCreate, value);
+			set
+			{
+				if (value != null)
+				{
+					if (DateTime.Compare((DateTime)value, DateTime.Now) > 0)
+					{
+						MessageBox.Show($"Некорректная дата рождения", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+						value = DateTime.Now;
+					}
+				}
+				Set(ref _dateTimeCreate, value);
+			}
 		}
 		public ObservableCollection<PhoneNumber> PhonesMainCreate
 		{
@@ -116,15 +175,6 @@ namespace PhoneBookWPF.Models
 			set => Set(ref _phoneWorkSelect, value);
 		}
 
-		public ICommand AddAbonentCommand { get; private set; }
-		public ICommand ClearAbonentCommand { get; private set; }
-		public ICommand AddPhoneMainCommand { get; private set; }
-		public ICommand DeletePhoneMainCommand { get; private set; }
-		public ICommand AddPhoneHomeCommand { get; private set; }
-		public ICommand DeletePhoneHomeCommand { get; private set; }
-		public ICommand AddPhoneWorkCommand { get; private set; }
-		public ICommand DeletePhoneWorkCommand { get; private set; }
-
 		public MainViewModel()
 		{
 			_phoneBook = PhoneBook.GetPhoneBook();
@@ -141,117 +191,18 @@ namespace PhoneBookWPF.Models
 			PhonesMainCreate = new();
 			PhonesHomeCreate = new();
 			PhonesWorkCreate = new();
+
+			SelectedNamesGroups = new();
+			GenerateListNamesGroup();
 		}
 
-		private void CommandInitialization()
+		private void GenerateListNamesGroup()
 		{
-			AddAbonentCommand = new CommandBase(OnCreateAbonent, CanCreateAbonent);
-			ClearAbonentCommand = new CommandBase(OnClearAbonent, CanClearAbonent);
-			AddPhoneMainCommand = new CommandBase(OnAddPhoneMain, CanAddPhoneMain);
-			DeletePhoneMainCommand = new CommandBase(OnDeletePhoneMain, CanDeletePhoneMain);
-			AddPhoneHomeCommand = new CommandBase(OnAddPhoneHome, CanAddPhoneHome);
-			DeletePhoneHomeCommand = new CommandBase(OnDeletePhoneHome, CanDeletePhoneHome);
-			AddPhoneWorkCommand = new CommandBase(OnAddPhoneWork, CanAddPhoneWork);
-			DeletePhoneWorkCommand = new CommandBase(OnDeletePhoneWork, CanDeletePhoneWork);
-		}
-
-		private bool CanCreateAbonent(object obj)
-		{
-			return NameCreate != null && NameCreate.Length > 0 && SurnameCreate != null && SurnameCreate.Length > 0 &&
-				((PhonesMainCreate != null && PhonesMainCreate.Count > 0) || (PhonesHomeCreate != null && PhonesHomeCreate.Count > 0) || (PhonesWorkCreate != null && PhonesWorkCreate.Count > 0));
-		}
-
-		private void OnCreateAbonent(object obj)
-		{
-
-		}
-
-		private bool CanClearAbonent(object obj) => true;
-
-		private void OnClearAbonent(object obj)
-		{
-			NameCreate = null;
-			SurnameCreate = null;
-			ResidentCreate = null;
-			DateTimeCreate = null;
-			PhonesMainCreate = null;
-			PhoneMainAdd = null;
-			PhoneMainSelect = null;
-			PhonesHomeCreate = null;
-			PhoneHomeAdd = null;
-			PhoneHomeSelect = null;
-			PhonesWorkCreate = null;
-			PhoneWorkAdd = null;
-			PhoneWorkSelect = null;
-		}
-
-		private bool CanAddPhoneMain(object obj)
-		{
-			return PhoneMainAdd != null && PhoneMainAdd.Length > 0;
-		}
-
-		private void OnAddPhoneMain(object obj)
-		{
-			
-		}
-
-		private bool CanDeletePhoneMain(object obj)
-		{
-			return PhoneMainSelect != null;
-		}
-
-		private void OnDeletePhoneMain(object obj)
-		{
-			PhonesMainCreate.Remove(PhoneMainSelect);
-			PhoneMainSelect = null;
-		}
-
-		private bool CanAddPhoneHome(object obj)
-		{
-			return PhoneHomeAdd != null && PhoneHomeAdd.Length > 0;
-		}
-
-		private void OnAddPhoneHome(object obj)
-		{
-			/*
-			PhoneNumber phone = new(PhoneHomeAdd, PhoneType.Личный);
-			PhonesHomeCreate.Add(phone);
-			*/
-		}
-
-		private bool CanDeletePhoneHome(object obj)
-		{
-			return PhoneHomeSelect != null;
-		}
-
-		private void OnDeletePhoneHome(object obj)
-		{
-			PhonesHomeCreate.Remove(PhoneHomeSelect);
-			PhoneHomeSelect = null;
-		}
-
-		private bool CanDeletePhoneWork(object arg)
-		{
-			return PhoneWorkSelect != null;
-		}
-
-		private void OnDeletePhoneWork(object obj)
-		{
-			PhonesWorkCreate.Remove(PhoneWorkSelect);
-			PhoneWorkSelect = null;
-		}
-
-		private bool CanAddPhoneWork(object arg)
-		{
-			return PhoneWorkAdd != null && PhoneWorkAdd.Length > 0;
-		}
-
-		private void OnAddPhoneWork(object obj)
-		{
-			/*
-			PhoneNumber phone = new(PhoneWorkAdd, PhoneType.Личный);
-			PhonesWorkCreate.Add(phone);
-			*/
+			AllNamesGroups = new();
+			foreach (var item in AbonentsGroups)
+			{
+				AllNamesGroups.Add(item.Name);
+			}
 		}
 	}
 }
