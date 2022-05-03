@@ -15,6 +15,8 @@
         <converter:PhoneNumberConvertorMain x:Key="ConverterMain"/>
         <converter:PhoneNumberConvertorHome x:Key="ConverterHome"/>
         <converter:PhoneNumberConvertorWork x:Key="ConverterWork"/>
+        <converter:IEnumerableAbonentConverter x:Key="AbonentConverter"/>
+        <converter:AbonentGroupInStringConverter x:Key="AbonentsGroupConverter"/>
     </Window.Resources>
     
     <TabControl>
@@ -32,15 +34,15 @@
                         </StackPanel>
                     </GroupBox>
                 </DockPanel>
-                <DataGrid ItemsSource="{Binding Abonents}" SelectedItem="{Binding SelectedAbonent}" SelectionMode="Single" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid ItemsSource="{Binding Abonents, Converter={StaticResource AbonentConverter}, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedAbonent}" SelectionMode="Single" AutoGenerateColumns="False" IsReadOnly="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Имя" Binding="{Binding Name, TargetNullValue=Отсутствует}"/>
-                        <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname, TargetNullValue=Отсутствует}"/>
-                        <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth, TargetNullValue=Отсутствует, StringFormat=dd.mm.yyyy}"/>
-                        <DataGridTextColumn Header="Место положения" Binding="{Binding Residence, TargetNullValue=Отсутствует}"/>
-                        <DataGridTextColumn Header="Телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterMain}}"/>
-                        <DataGridTextColumn Header="Домашний телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterHome}}"/>
-                        <DataGridTextColumn Header="Рабочий телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterWork}}"/>
+                        <DataGridTextColumn Header="Имя" Binding="{Binding Name, TargetNullValue=Отсутствует}" Width="*"/>
+                        <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname, TargetNullValue=Отсутствует}" Width="*"/>
+                        <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth, TargetNullValue=Отсутствует, StringFormat=dd.mm.yyyy}" Width="*"/>
+                        <DataGridTextColumn Header="Место положения" Binding="{Binding Residence, TargetNullValue=Отсутствует}" Width="*"/>
+                        <DataGridTextColumn Header="Телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterMain}}" Width="*"/>
+                        <DataGridTextColumn Header="Домашний телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterHome}}" Width="*"/>
+                        <DataGridTextColumn Header="Рабочий телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterWork}}" Width="*"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </DockPanel>
@@ -54,30 +56,38 @@
 
                 <DockPanel Grid.Column="0">
                     <DockPanel DockPanel.Dock="Top">
-                        
+                        <TextBox Margin="4"/>
                     </DockPanel>
-                    <ListBox/>
+                    <ListBox ItemsSource="{Binding AbonentsGroups, Converter={StaticResource AbonentsGroupConverter}, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedGroupName}"/>
                 </DockPanel>
 
-                <DockPanel Grid.Column="1">
-                    <DockPanel DockPanel.Dock="Top">
-
+                <GroupBox Grid.Column="1" Header="Список абонетов группы">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top">
+                            <TextBox/>
+                        </DockPanel>
+                        <DataGrid ItemsSource="{Binding SelectedGoupList, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Имя" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*"/>
+                                <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth, StringFormat=dd.mm.yyyy}" Width="*"/>
+                                <DataGridTextColumn Header="Место положения" Binding="{Binding Residence, TargetNullValue=Отсутствует}" Width="*"/>
+                                <DataGridTextColumn Header="Телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterMain}}" Width="*"/>
+                                <DataGridTextColumn Header="Домашний телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterHome}}" Width="*"/>
+                                <DataGridTextColumn Header="Рабочий телефон" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterWork}}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </DockPanel>
-                    <ListBox/>
-                </DockPanel>
+                </GroupBox>
             </Grid>
         </TabItem>
         <TabItem Header="Добавление Абонента">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="11*"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                
+
                 <GroupBox Header="Данные Абонента">
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Bottom">
@@ -170,10 +180,49 @@
                         </ScrollViewer>
                     </DockPanel>
                 </GroupBox>
-                <GroupBox Grid.Column="1" Grid.Row="0" Header="Группы, в которых состоит абонент">
-                    <ListBox/>
+
+                <GroupBox Grid.Column="1" Header="Группы">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Header="Список доступных групп">
+                            <DockPanel>
+                                <DockPanel DockPanel.Dock="Top">
+                                    <TextBox/>
+                                </DockPanel>
+                                <ListBox Margin="0 3 0 0" ItemsSource="{Binding AllNamesGroups, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedAllGroupName}">
+                                    
+                                </ListBox>
+                            </DockPanel>
+                        </GroupBox>
+                        <GroupBox Grid.Column="1" Header="Группы абонента">
+                            <DockPanel>
+                                <DockPanel DockPanel.Dock="Top">
+                                    <TextBox/>
+                                </DockPanel>
+                                <ListBox Margin="0 3 0 0" ItemsSource="{Binding SelectedNamesGroups, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedNameGroup}">
+
+                                </ListBox>
+                            </DockPanel>
+                        </GroupBox>
+                        <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Content="Добавить в группу" Height="30" Margin="0 0 5 0" Command="{Binding AddNameInSelectedGroup}"/>
+                            <Button Grid.Column="1" Content="Удалить из группы" Height="30" Margin="5 0 0 0" Command="{Binding RemoveNameInSelectedGroup}"/>
+                        </Grid>
+                    </Grid>
                 </GroupBox>
-                
             </Grid>
         </TabItem>
         <TabItem Header="Добавление группы">
