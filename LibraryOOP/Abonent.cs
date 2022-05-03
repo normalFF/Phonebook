@@ -84,8 +84,10 @@ namespace LibraryOOP
 		public override bool Equals(object obj)
 		{
 			if (obj is Abonent abonent)
-				return Equals(abonent.Name, Name) && Equals(abonent.Surname, Surname)
-					&& Equals(abonent.Residence, Residence) && Equals(abonent.DateOfBirth, DateOfBirth);
+				return string.Equals(abonent.Name, Name, StringComparison.OrdinalIgnoreCase) && 
+					string.Equals(abonent.Surname, Surname, StringComparison.OrdinalIgnoreCase) && 
+					string.Equals(abonent.Residence, Residence, StringComparison.OrdinalIgnoreCase) && 
+					Equals(abonent.DateOfBirth, DateOfBirth);
 			return false;
 		}
 
