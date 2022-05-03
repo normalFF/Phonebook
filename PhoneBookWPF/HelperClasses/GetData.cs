@@ -1,5 +1,6 @@
 ﻿using System;
 using Bogus;
+using System.Linq;
 using LibraryOOP;
 
 namespace PhoneBookWPF
@@ -31,6 +32,11 @@ namespace PhoneBookWPF
 					phoneBook.AddAbonentPhone(item, phone);
 				}
 			}
+
+			phoneBook.CreateAbonentsGroup("Test Group", phoneBook.Abonents.ToList());
+			phoneBook.CreateAbonentsGroup("Test Group1", phoneBook.Abonents.ToList());
+			phoneBook.CreateAbonentsGroup("Test Group2", phoneBook.Abonents.ToList());
+			phoneBook.CreateAbonentsGroup("Test Group3", phoneBook.Abonents.ToList());
 		}
 	}
 }
