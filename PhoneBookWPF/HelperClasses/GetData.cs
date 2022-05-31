@@ -16,7 +16,7 @@ namespace PhoneBookWPF
 
 			for (int i = 0; i < 15; i++)
 			{
-				var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), (PhoneType)rn.Next(0, 3));
+				var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), "Рабочий");
 				var gender = faker.Person.Gender;
 				phoneBook.AddAbonent(faker.Name.FirstName(gender), faker.Name.LastName(gender), phone, DateTime.Now);
 			}
@@ -25,18 +25,22 @@ namespace PhoneBookWPF
 
 			foreach (var item in abonents)
 			{
-				int num = rn.Next(1, 3);
+				int num = rn.Next(1, 5);
 				for (int j = 0; j < num; j++)
 				{
-					var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), (PhoneType)rn.Next(0, 3));
+					var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), "Личный");
 					phoneBook.AddAbonentPhone(item, phone);
 				}
 			}
 
-			phoneBook.CreateAbonentsGroup("Test Group", phoneBook.Abonents.ToList());
-			phoneBook.CreateAbonentsGroup("Test Group1", phoneBook.Abonents.ToList());
-			phoneBook.CreateAbonentsGroup("Test Group2", phoneBook.Abonents.ToList());
-			phoneBook.CreateAbonentsGroup("Test Group3", phoneBook.Abonents.ToList());
+			for (int i = 0; i < 4; i++)
+			{
+				foreach (var item in phoneBook.Abonents)
+				{
+					if (rn.Next(0, 3) == 1)
+						phoneBook.AddAbonentsGroup($"group{i}", item);
+				}
+			}
 		}
 	}
 }
