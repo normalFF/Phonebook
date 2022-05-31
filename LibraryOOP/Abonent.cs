@@ -1,46 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace LibraryOOP
 {
 	public class Abonent
 	{
+		private List<string> _groups { get; set; }
 		private List<PhoneNumber> _phoneNumbers { get; set; }
 
 		public string Name { get; private set; }
 		public string Surname { get; private set; }
 		public DateTime? DateOfBirth { get; private set; }
 		public string Residence { get; private set; }
-		public IEnumerable<PhoneNumber> PhoneNumbers { get => _phoneNumbers; }
+		public IEnumerable<string> Groups => _groups == null ? null : _groups;
+		public IEnumerable<PhoneNumber> PhoneNumbers => _phoneNumbers;
 
 		internal Abonent(string name, string surname, List<PhoneNumber> phones, DateTime? date = null, string residence = null)
 		{
-			IsCorrect(name, surname);
-
 			_phoneNumbers = phones;
+			_groups = new();
 			Name = name;
 			Surname = surname;
 			DateOfBirth = date;
 			Residence = residence;
 		}
 
-		private static void IsCorrect(string name, string surname)
+		internal Abonent(SerializedModelAbonent serializedData, List<PhoneNumber> phones)
 		{
-			if (name == null) throw new ArgumentNullException($"{nameof(name)} не может быть {name}");
-			if (surname == null) throw new ArgumentNullException($"{nameof(surname)} не может быть {surname}");
+			Name = serializedData.Name;
+			Surname = serializedData.Surname;
+			DateOfBirth = serializedData.DateOfBirth == null ? null : (DateTime?)Convert.ToDateTime(serializedData.DateOfBirth);
+			Residence = serializedData.Residence;
+			_phoneNumbers = phones;
+			_groups = new();
 		}
 
-		public IEnumerable<PhoneNumber> GetNumbers(PhoneType type)
+		public static bool IsCorrect(string name, string surname, List<PhoneNumber> phones, bool getInfo = false, DateTime? date = null)
 		{
-			List<PhoneNumber> phones = new();
-
-			foreach (var item in _phoneNumbers)
+			if (name == null)
 			{
-				if (item.Type == type)
-					phones.Add(item);
+				if (getInfo)
+				{
+					throw new ArgumentNullException($"{nameof(name)} не может быть {name}");
+				}
+				return false;
 			}
-			return phones;
+			if (surname == null)
+			{
+				if (getInfo)
+				{
+					throw new ArgumentNullException($"{nameof(surname)} не может быть {surname}");
+				}
+				return false;
+			}
+			if (date != null && DateTime.Compare((DateTime)date, DateTime.Now) > 0)
+			{
+				if (getInfo)
+				{
+					throw new ArgumentOutOfRangeException($"{nameof(date)} не может быть позже чем {DateTime.Now}");
+				}
+				return false;
+			}
+			if (phones == null)
+			{
+				if (getInfo)
+				{
+					throw new ArgumentNullException($"{nameof(phones)} должен содержать хотябы один номер телефона");
+				}
+				return false;
+			}
+			return true;
 		}
 
 		internal bool DeletePhone(PhoneNumber phone)
@@ -67,11 +96,31 @@ namespace LibraryOOP
 			return false;
 		}
 
+		internal bool AddGroup(string group)
+		{
+			if (string.IsNullOrEmpty(group) || _groups.Contains(group))
+			{
+				return false;
+			}
+			_groups.Add(group);
+			return true;
+		}
+
+		internal bool DeleteGroup(string group)
+		{
+			if (string.IsNullOrEmpty(group) || !_groups.Contains(group))
+			{
+				return false;
+			}
+			_groups.Remove(group);
+			return true;
+		}
+
 		public bool IsContainsPhone(PhoneNumber phone)
 		{
 			if (phone == null) return false;
 
-			foreach (var item in _phoneNumbers)
+			foreach (PhoneNumber item in _phoneNumbers)
 			{
 				if (item.Equals(phone))
 				{
@@ -84,23 +133,23 @@ namespace LibraryOOP
 		public override bool Equals(object obj)
 		{
 			if (obj is Abonent abonent)
-				return string.Equals(abonent.Name, Name, StringComparison.OrdinalIgnoreCase) && 
-					string.Equals(abonent.Surname, Surname, StringComparison.OrdinalIgnoreCase) && 
-					string.Equals(abonent.Residence, Residence, StringComparison.OrdinalIgnoreCase) && 
+				return string.Equals(abonent.Name, Name, StringComparison.OrdinalIgnoreCase) &&
+					string.Equals(abonent.Surname, Surname, StringComparison.OrdinalIgnoreCase) &&
+					string.Equals(abonent.Residence, Residence, StringComparison.OrdinalIgnoreCase) &&
 					Equals(abonent.DateOfBirth, DateOfBirth);
 			return false;
 		}
 
 		public override string ToString()
 		{
-			string returnResult = $"{Name}\n{Surname}";
+			string returnResult = $"{Name}\r\n{Surname}";
 
-			if (!(DateOfBirth is null)) returnResult += $"\n{DateOfBirth}";
-			if (!(Residence is null)) returnResult += $"\n{Residence}";
+			if (!(DateOfBirth is null)) returnResult += $"\r\n{DateOfBirth?.ToString("dd.MM.yyyy")}";
+			if (!(Residence is null)) returnResult += $"\r\n{Residence}";
 
-			foreach (var item in _phoneNumbers)
+			foreach (PhoneNumber item in _phoneNumbers)
 			{
-				returnResult += $"\n{item.Type} {item.Phone}";
+				returnResult += $"\r\n{item.Type} {item.Phone}";
 			}
 
 			return returnResult;
