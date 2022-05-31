@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.IO;
+using System.Text.Json;
+using System.Text.Encodings.Web;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace LibraryOOP
 {
@@ -8,11 +12,14 @@ namespace LibraryOOP
 	{
 		private static PhoneBook _phoneBook;
 		private List<Abonent> _abonents { get; set; }
-		private List<AbonentsGroup> _abonentsGroups { get; set; }
-		
-		public IEnumerable<Abonent> Abonents { get => _abonents; }
-		public IEnumerable<AbonentsGroup> AbonentsGroup { get => _abonentsGroups; }
+		private List<string> _abonentsGroups { get; set; }
+		private List<string> _phoneType { get; set; }
+		private bool _saved;
 
+
+		public IEnumerable<Abonent> Abonents => _abonents;
+		public IEnumerable<string> AbonentsGroup => _abonentsGroups;
+		public IEnumerable<string> PhoneType => _phoneType;
 		public int AbonentCount { get => _abonents.Count; }
 		public int AbonentsGroupCount { get => _abonentsGroups.Count; }
 
@@ -20,6 +27,7 @@ namespace LibraryOOP
 		{
 			_abonents = new();
 			_abonentsGroups = new();
+			_phoneType = new();
 		}
 
 		public static PhoneBook GetPhoneBook()
@@ -29,35 +37,145 @@ namespace LibraryOOP
 				lock (new object())
 				{
 					if (_phoneBook is null)
+					{
 						_phoneBook = new PhoneBook();
+					}
 				}
 			}
 			return _phoneBook;
 		}
 
-		public static PhoneNumber CreatePhoneNumber(string phone, PhoneType phoneType)
+		public static void DeletePhoneBook()
 		{
-			return PhoneNumber.CreatePhoneNumber(phone, phoneType);
+			_phoneBook = null;
 		}
 
-		private static bool CheckIsNull(string name, object abonent)
+		public bool IsSaved()
 		{
-			return name is null || abonent is null;
+			return _saved;
+		}
+
+		public void LoadData(string fileWay)
+		{
+			SerializedModelAbonent[] loadData;
+			string readResult;
+
+			using (StreamReader file = new(fileWay))
+			{
+				readResult = file.ReadToEnd();
+			}
+
+			loadData = (SerializedModelAbonent[])JsonSerializer.Deserialize(
+				readResult,
+				typeof(SerializedModelAbonent[]),
+				new JsonSerializerOptions()
+				{
+					WriteIndented = true,
+					AllowTrailingCommas = true,
+					Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+				}
+			);
+
+			List<Abonent> abonents =
+				loadData.Where(i => Abonent.IsCorrect(
+								i.Name,
+								i.Surname,
+								i.Phones.Where(p => PhoneNumber.IsCorrectPhone(p.Phone, p.Type, true))
+										.Select(p => PhoneNumber.CreatePhoneNumber(p)).ToList(),
+								true,
+								i.DateOfBirth == null ? null : Convert.ToDateTime(i.DateOfBirth, DateTimeFormatInfo.CurrentInfo)))
+						.Select(i => new Abonent(
+								i,
+								i.Phones.Select(p => PhoneNumber.CreatePhoneNumber(p)).ToList()))
+						.ToList();
+
+			foreach (SerializedModelAbonent model in loadData)
+			{
+				if (model.Groups != null)
+				{
+					foreach (Abonent abonent in abonents)
+					{
+						if (string.Equals(abonent.Name, model.Name, StringComparison.OrdinalIgnoreCase)
+							&& string.Equals(abonent.Surname, model.Surname, StringComparison.OrdinalIgnoreCase)
+							&& string.Equals(abonent.Residence, model.Residence, StringComparison.OrdinalIgnoreCase)
+							&& Equals(abonent.DateOfBirth, model.DateOfBirth == null ? null : Convert.ToDateTime(model.DateOfBirth, DateTimeFormatInfo.CurrentInfo)))
+						{
+							foreach (string group in model.Groups)
+							{
+								AddAbonentsGroup(group, abonent);
+							}
+						}
+					}
+				}
+			}
+
+			_abonents = abonents;
+		}
+
+		public void SaveData(string fileWay)
+		{
+			SerializedModelAbonent[] serializeObject = Abonents.Select(i => new SerializedModelAbonent
+			{
+				Name = i.Name,
+				Surname = i.Surname,
+				DateOfBirth = i.DateOfBirth?.ToString("dd.MM.yyyy"),
+				Residence = i.Residence,
+				Phones = i.PhoneNumbers.Select(i => new SerializedModelPhone() 
+				{
+					Type = i.Type,
+					Phone = i.Phone
+				}).ToArray(),
+				Groups = i.Groups?.ToArray(),
+			}).ToArray();
+
+			string serializeResult = JsonSerializer.Serialize(
+					serializeObject,
+					typeof(SerializedModelAbonent[]),
+					new JsonSerializerOptions()
+					{
+						WriteIndented = true,
+						AllowTrailingCommas = true,
+						Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+					}
+				);
+
+			using (StreamWriter file = new(fileWay))
+			{
+				file.Write(serializeResult);
+			}
+		}
+
+		public static PhoneNumber CreatePhoneNumber(string phone, string phoneType)
+		{
+			return PhoneNumber.CreatePhoneNumber(phone, phoneType);
 		}
 
 
 		public bool AddAbonent(string name, string surname, List<PhoneNumber> phones, DateTime? date = null, string residence = null)
 		{
-			foreach (var item in phones)
+			foreach (PhoneNumber item in phones)
 			{
-				if (item == null) return false;
+				if (item == null)
+				{
+					return false;
+				}
 			}
 
 			Abonent newAbonent = new(name, surname, phones, date, residence);
-			
+
 			if (!_abonents.Contains(newAbonent))
 			{
 				_abonents.Add(newAbonent);
+
+				foreach (PhoneNumber item in newAbonent.PhoneNumbers)
+				{
+					if (!_phoneType.Contains(item.Type))
+					{
+						_phoneType.Add(item.Type);
+					}
+				}
+
+				_saved = false;
 				return true;
 			}
 			return false;
@@ -65,96 +183,120 @@ namespace LibraryOOP
 
 		public bool AddAbonent(string name, string surname, PhoneNumber phone, DateTime? date = null, string residence = null)
 		{
-			if (phone == null) return false;
-			return AddAbonent(name, surname, new List<PhoneNumber>() { phone }, date, residence);
-		}
-
-		public bool AddAbonentsGroup(AbonentsGroup group, Abonent abonent)
-		{
-			return AddAbonentsGroup(group, new List<Abonent>() { abonent });
-		}
-
-		public bool AddAbonentsGroup(AbonentsGroup group, List<Abonent> abonents)
-		{
-			if (group == null || abonents == null) return false;
-
-			foreach (var item in abonents)
+			if (phone == null)
 			{
-				group.AddAbonent(item);
+				return false;
 			}
-			return true;
+			if (AddAbonent(name, surname, new List<PhoneNumber>() { phone }, date, residence))
+			{
+				_saved = false;
+				return true;
+			}
+			return false;
 		}
 
-
-		public bool CreateAbonentsGroup(string name, Abonent abonent)
+		public bool AddAbonentsGroup(string group, Abonent abonent)
 		{
-			return CreateAbonentsGroup(name, new List<Abonent>() { abonent });
-		}
-
-		public bool CreateAbonentsGroup(string name, List<Abonent> abonents)
-		{
-			if (CheckIsNull(name, abonents)) return false;
-			var group = new AbonentsGroup(name, abonents);
-			_abonentsGroups.Add(group);
-			return true;
+			if (abonent.AddGroup(group))
+			{
+				_saved = false;
+				if (!_abonentsGroups.Contains(group))
+				{
+					_abonentsGroups.Add(group);
+				}
+				return true;
+			}
+			return false;
 		}
 
 
 		public bool AddAbonentPhone(Abonent abonent, PhoneNumber phone)
 		{
-			if (phone == null) return false;
-			if (abonent.IsContainsPhone(phone)) return false;
-			else
+			if (abonent != null)
 			{
-				abonent.AddPhone(phone);
-				return true;
+				if (abonent.AddPhone(phone))
+				{
+					_saved = false;
+					if (!_phoneType.Contains(phone.Type))
+					{
+						_phoneType.Add(phone.Type);
+					}
+					return true;
+				}
 			}
+			return false;
 		}
 
 		public bool RemoveAbonentPhone(Abonent abonent, PhoneNumber phone)
 		{
-			if (abonent.IsContainsPhone(phone)) return false;
-			else
+			if (abonent != null)
 			{
-				abonent.DeletePhone(phone);
-				return true;
+				if (abonent.DeletePhone(phone))
+				{
+					_saved = false;
+					return true;
+				}
 			}
+			return false;
 		}
 
 		public bool RemoveAbonent(Abonent abonent)
 		{
 			if (_abonents.Contains(abonent))
 			{
-				foreach (var item in _abonentsGroups)
+				foreach (string group in abonent.Groups)
 				{
-					item.RemoveAbonent(abonent);
+					int count = 0;
+					foreach (Abonent item in _abonents)
+					{
+						if (item.Groups.Contains(group))
+						{
+							count++;
+						}
+					}
+					if (count == 1)
+					{
+						_abonentsGroups.Remove(group);
+					}
 				}
-				_abonents.Remove(abonent);
 
+				_abonents.Remove(abonent);
+				_saved = false;
 				return true;
 			}
 			return false;
 		}
 
-		public bool RemoveGroup(AbonentsGroup group)
+		public bool RemoveGroup(string group)
 		{
 			if (_abonentsGroups.Contains(group))
 			{
+				foreach (Abonent item in _abonents)
+				{
+					item.DeleteGroup(group);
+				}
 				_abonentsGroups.Remove(group);
+				_saved = false;
 				return true;
 			}
 			return false;
 		}
 
-		
+
 		public bool CheckNameGroup(string name)
 		{
-			if (name is null) return false;
-			foreach (var item in _abonentsGroups)
+			if (string.IsNullOrEmpty(name))
 			{
-				if (item.Name.Equals(name)) return false;
+				return false;
 			}
-			return true;
+			foreach (string item in _abonentsGroups)
+			{
+				if (item.Equals(name, StringComparison.OrdinalIgnoreCase))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }
