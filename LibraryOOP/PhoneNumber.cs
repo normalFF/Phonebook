@@ -2,36 +2,67 @@
 
 namespace LibraryOOP
 {
-	public enum PhoneType { Рабочий, Домашний, Личный }
-
 	public class PhoneNumber
 	{
 		private static readonly char[]
 			_numbers = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' },
 			_serviceSymbols = new char[] { '-', '(', ')', ' ', '.', '+', 'x' };
 
-		public PhoneType Type { get; private set; }
+		public string Type { get; private set; }
 		public string Phone { get; private set; }
 
-		private PhoneNumber(string phone, PhoneType type)
+		private PhoneNumber(string phone, string type)
 		{
 			Type = type;
 			Phone = phone;
 		}
 
-		internal static PhoneNumber CreatePhoneNumber(string phone, PhoneType type)
+		internal static PhoneNumber CreatePhoneNumber(SerializedModelPhone serializedModel)
 		{
-			if (!IsCorrectPhone(phone)) return null;
-			return new PhoneNumber(phone, type);
+			if (serializedModel != null)
+			{
+				return !IsCorrectPhone(serializedModel.Phone) || string.IsNullOrEmpty(serializedModel.Type)
+					? null : new PhoneNumber(serializedModel.Phone, serializedModel.Type);
+			}
+			return null;
+		}
+
+		internal static PhoneNumber CreatePhoneNumber(string phone, string type)
+		{
+			return !IsCorrectPhone(phone) || string.IsNullOrEmpty(type) ? null : new PhoneNumber(phone, type);
+		}
+
+		public static bool IsCorrectPhone(string phone, string type, bool getInfo = false)
+		{
+			if (string.IsNullOrEmpty(type))
+			{
+				if (getInfo)
+				{
+					throw new ArgumentNullException($"Тип телефона не может быть \"{type}\"");
+				}
+				return false;
+			}
+			if (!IsCorrectPhone(phone))
+			{
+				if (getInfo)
+				{
+					throw new ArgumentException($"Номер телефона не может быть \"{phone}\"");
+				}
+				return false;
+			}
+			return true;
 		}
 
 		public static bool IsCorrectPhone(string phone)
 		{
-			var result = phone.TrimStart(new char[] { 'x', '+', '-', '*', '#', '0' });
+			string result = phone.TrimStart(new char[] { 'x', '+', '-', '*', '#', '0' });
 
-			if (result.Length < 8) return false;
+			if (result.Length < 8)
+			{
+				return false;
+			}
 
-			var 
+			int
 				count = result.Length;
 			bool
 				open = false,
@@ -58,20 +89,35 @@ namespace LibraryOOP
 				{
 					count--;
 				}
-				else if (!Check(item, _numbers)) return false;
+				else if (!Check(item, _numbers))
+				{
+					return false;
+				}
 
-				if (count < 8) return false;
+				if (count < 8)
+				{
+					return false;
+				}
 			}
 
-			if (zero) return true;
-			else return false;
+			if (zero)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		private static bool Check(char item, char[] arrayChars)
 		{
-			foreach (var i in arrayChars)
+			foreach (char i in arrayChars)
 			{
-				if (item == i) return true;
+				if (item == i)
+				{
+					return true;
+				}
 			}
 			return false;
 		}
@@ -79,27 +125,32 @@ namespace LibraryOOP
 		public override bool Equals(object obj)
 		{
 			if (obj is PhoneNumber phone)
+			{
 				return phone.Type == Type && Equals(phone.Phone, Phone);
+			}
 			return false;
 		}
 
 		private static bool Equals(string str1, string str2)
 		{
-			string Clear(string str)
+			static string Clear(string str)
 			{
-				var result = str.TrimStart(new char[] { '+', '-', '*', '#', '0' });
+				string result = str.TrimStart(new char[] { '+', '-', '*', '#', '0' });
 
-				foreach (var item in _serviceSymbols)
+				foreach (char item in _serviceSymbols)
 				{
 					for (int i = result.Length - 1; i >= 0; i--)
 					{
-						if (result[i] == item) result = result.Remove(i, 1);
+						if (result[i] == item)
+						{
+							result = result.Remove(i, 1);
+						}
 					}
 				}
 				return result;
 			}
 
-			return string.Equals(Clear(str1), Clear(str2));
+			return string.Equals(Clear(str1), Clear(str2), StringComparison.Ordinal);
 		}
 
 		public override int GetHashCode()
@@ -107,7 +158,7 @@ namespace LibraryOOP
 			int result = 0;
 			int count = 0;
 
-			foreach (var item in Phone)
+			foreach (char item in Phone)
 			{
 				if (item != ')' && item != '(' && item != '-')
 					result += (int)Math.Pow(Convert.ToInt32(item), 2 + count);
@@ -118,7 +169,7 @@ namespace LibraryOOP
 
 		public override string ToString()
 		{
-			return $"{Type}\n{Phone}";
+			return $"{Type}\r\n{Phone}";
 		}
 	}
 }
