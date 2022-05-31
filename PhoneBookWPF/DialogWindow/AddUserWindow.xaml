@@ -1,0 +1,224 @@
+﻿<Window x:Class="PhoneBookWPF.DialogWindow.AddUserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PhoneBookWPF.DialogWindow"
+        xmlns:model="clr-namespace:PhoneBookWPF.Models"
+        xmlns:converter="clr-namespace:PhoneBookWPF.Infrastructure.Converter"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="500" Width="600" ResizeMode="NoResize"
+        DataContext="{Binding AbonentView, Source={StaticResource Locator}}">
+
+    <Window.Resources>
+        <converter:PhoneNumberConvertor x:Key="ConverterMain"/>
+        <converter:IEnumerableAbonentConverter x:Key="AbonentConverter"/>
+        <converter:IEnumerableGroupConverter x:Key="GroupConverter"/>
+        <converter:VisibleConverter x:Key="ReverseVisibility"/>
+    </Window.Resources>
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Visibility="{Binding Visibility, Converter={StaticResource ReverseVisibility}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10*"/>
+                <RowDefinition Height="6*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="Данные абонента" Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0 0 2 0">
+                        <Label Content="Имя Абонента"/>
+                        <TextBox Text="{Binding NameCreate, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Фамилия Абонента"/>
+                        <TextBox Text="{Binding SurnameCreate, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="2 0 0 0">
+                        <Label Content="Место жительства Абонента (Необязательно)"/>
+                        <TextBox Text="{Binding ResidentCreate, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Дата рождения Абонента (Необязательно)"/>
+                        <DatePicker Text="{Binding DateTimeCreate, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" Grid.ColumnSpan="2">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Label Content="Список номеров Абонента"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0" Margin="0 0 2 0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Label Grid.Row="0" Content="Номер телефона"/>
+                                <TextBox Grid.Row="1" Text="{Binding PhoneAdd, UpdateSourceTrigger=PropertyChanged}"/>
+                                <ListBox Grid.Row="2" Margin="0 5 0 0" ItemsSource="{Binding PhonesCreate, UpdateSourceTrigger=PropertyChanged}"
+                                     SelectedItem="{Binding PhoneSelect, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <StackPanel Grid.Column="1" Margin="2 0 0 0">
+                                <Label Content="Тип телефона"/>
+                                <ComboBox ItemsSource="{Binding PhoneTypes}" SelectedIndex="0" SelectedItem="{Binding SelectTypePhone}"/>
+                                <Label Content="Новый тип"/>
+                                <TextBox Text="{Binding NewTypePhone}"/>
+                                <Grid Margin="0 5 0 0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Content="Добавить телефон" Height="30" Margin="0 0 2 0" Command="{Binding AddPhoneCommand}"/>
+                                    <Button Grid.Column="1" Content="Удалить телефон" Margin="2 0 0 0" Command="{Binding DeletePhoneCommand}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </GroupBox>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Content="Список групп абонента" Grid.ColumnSpan="3"/>
+                <GroupBox Grid.Row="1" Header="Доступные группы">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top" Margin="0 3">
+                            <Label Content="{StaticResource SearchIcon}"/>
+                            <TextBox/>
+                        </DockPanel>
+                        <ListBox SelectedItem="{Binding CurrentGroup}">
+                            <ListBox.ItemsSource>
+                                <MultiBinding Converter="{StaticResource GroupConverter}">
+                                    <Binding Path="AbonentsGroups"/>
+                                    <Binding Path="SelectedNamesGroups"/>
+                                </MultiBinding>
+                            </ListBox.ItemsSource>
+                        </ListBox>
+                    </DockPanel>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Grid.Column="2" Header="Выбраные группы">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top" Margin="0 3">
+                            <Label Content="{StaticResource SearchIcon}"/>
+                            <TextBox/>
+                        </DockPanel>
+                        <ListBox ItemsSource="{Binding SelectedNamesGroups, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedNameGroup}"/>
+                    </DockPanel>
+                </GroupBox>
+                <Grid Grid.Column="1" Grid.Row="1" Margin="5 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Button Content="{StaticResource IconArrowRight}" Height="30" Margin="0 0 0 5" Command="{Binding AddNameInSelectedGroup}"/>
+                            <Button Content="{StaticResource IconArrowLeft}" Grid.Row="1" Height="30" Margin="0 5 0 0" Command="{Binding RemoveNameInSelectedGroup}"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="2" Margin="5 0 5 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Добавить Абонента" Height="30"/>
+                <Button Content="Очистить" Grid.Column="1" Margin="5 0"/>
+                <Button Content="Отмена" Grid.Column="2"/>
+            </Grid>
+        </Grid>
+
+        <Grid Visibility="{Binding Visibility}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="Данные абонента" Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0 0 2 0">
+                        <Label Content="Имя Абонента"/>
+                        <TextBox Text="{Binding NameCreate, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                        <Label Content="Фамилия Абонента"/>
+                        <TextBox Text="{Binding SurnameCreate, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="2 0 0 0">
+                        <Label Content="Место жительства Абонента"/>
+                        <TextBox Text="{Binding ResidentCreate, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                        <Label Content="Дата рождения Абонента"/>
+                        <TextBox Text="{Binding DateTimeCreate, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+            <Grid Grid.Row="1" Margin="5 0 5 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Margin="0 0 2 0">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Список номеров абонента"/>
+                        </DockPanel>
+                        <ListBox/>
+                    </DockPanel>
+                </Grid>
+                <Grid Grid.Column="1" Margin="2 0 0 0">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top">
+                            <Label Content="Список групп абонента"/>
+                        </DockPanel>
+                        <ListBox/>
+                    </DockPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
