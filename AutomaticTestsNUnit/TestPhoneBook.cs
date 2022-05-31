@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Bogus;
 using LibraryOOP;
 using System.Collections.Generic;
+using System.IO;
 
 namespace AutomaticTestsNUnit
 {
@@ -23,7 +24,7 @@ namespace AutomaticTestsNUnit
 
 			for (int i = 0; i < 15; i++)
 			{
-				var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), (PhoneType)rn.Next(0, 3));
+				var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), "Рабочий");
 				phoneNumber.Add(phone);
 				var gender = faker.Person.Gender;
 				phoneBook.AddAbonent(faker.Name.FirstName(gender), faker.Name.LastName(gender), phone);
@@ -36,7 +37,7 @@ namespace AutomaticTestsNUnit
 				int num = rn.Next(1, 3);
 				for (int j = 0; j < num; j++)
 				{
-					var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), (PhoneType)rn.Next(0, 3));
+					var phone = PhoneBook.CreatePhoneNumber(faker.Phone.PhoneNumber(), "Личный");
 					phoneNumber.Add(phone);
 					phoneBook.AddAbonentPhone(item, phone);
 				}
@@ -73,13 +74,19 @@ namespace AutomaticTestsNUnit
 		{
 			Faker faker = new();
 			Random random = new();
-			
+
 			for (int i = 0; i < 30; i++)
 			{
 				var phone = faker.Phone.PhoneNumber();
 				Console.WriteLine(phone);
 				Console.WriteLine(PhoneNumber.IsCorrectPhone(phone));
 			}
+		}
+
+		[Test]
+		public void SerializeData()
+		{
+			Console.WriteLine(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "test.json");
 		}
 	}
 }
