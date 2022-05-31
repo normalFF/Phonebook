@@ -1,17 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Windows;
+using System;
+using PhoneBookWPF.Models;
 
 namespace PhoneBookWPF
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
 	public partial class App : Application
 	{
+		private static IHost _host;
+		public static IHost Host => _host ??= Program.CreateHostBuilder(Environment.GetCommandLineArgs()).Build();
+
+		public static void ConfigureServices(HostBuilderContext host, IServiceCollection services)
+		{
+			services.AddSingleton<MainViewModel>();
+			services.AddTransient<AbonentAddViewModel>();
+		}
+
+		protected override async void OnStartup(StartupEventArgs e)
+		{
+			IHost host = Host;
+			base.OnStartup(e);
+			await host.StartAsync().ConfigureAwait(false);
+		}
+
+		protected override async void OnExit(ExitEventArgs e)
+		{
+			IHost host = Host;
+			await host.StopAsync().ConfigureAwait(false);
+			host.Dispose();
+			base.OnExit(e);
+		}
 	}
 }
