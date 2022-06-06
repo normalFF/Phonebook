@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LibraryOOP
 {
@@ -32,7 +33,7 @@ namespace LibraryOOP
 			DateOfBirth = serializedData.DateOfBirth == null ? null : (DateTime?)Convert.ToDateTime(serializedData.DateOfBirth);
 			Residence = serializedData.Residence;
 			_phoneNumbers = phones;
-			_groups = new();
+			_groups = serializedData.Groups == null ? new List<string>() : serializedData.Groups.ToList();
 		}
 
 		public static bool IsCorrect(string name, string surname, List<PhoneNumber> phones, bool getInfo = false, DateTime? date = null)
