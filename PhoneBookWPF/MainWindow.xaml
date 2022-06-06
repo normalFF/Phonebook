@@ -23,10 +23,10 @@
 
         <Menu Grid.Row="0" IsMainMenu="True" Background="White" BorderThickness="0 0 0 1" BorderBrush="#AAA">
             <MenuItem Header="Файл" Icon="{StaticResource IconFileEmpty}">
-                <MenuItem Header="Создать"/>
-                <MenuItem Header="Открыть" Icon="{StaticResource IconFolderOpen}"/>
-                <MenuItem Header="Сохранить" Icon="{StaticResource FloppyDiskIcon}"/>
-                <MenuItem Header="Сохранить как..." Icon="{StaticResource FloppyDiskIcon}"/>
+                <MenuItem Header="Создать" Command="{Binding CreateFile}"/>
+                <MenuItem Header="Открыть" Icon="{StaticResource IconFolderOpen}" Command="{Binding LoadFile}"/>
+                <MenuItem Header="Сохранить" Icon="{StaticResource FloppyDiskIcon}" Command="{Binding SaveFile}"/>
+                <MenuItem Header="Сохранить как..." Icon="{StaticResource FloppyDiskIcon}" Command="{Binding SaveFileAs}"/>
             </MenuItem>
             <MenuItem Header="Добавить Абонента" Icon="{StaticResource UserPlusIcon}" Command="{Binding CreateAbonentWindow}"/>
             <MenuItem Header="Добавить Группу" Icon="{StaticResource UsersIcon}"/>
@@ -55,8 +55,8 @@
                                 <ContextMenu>
                                     <MenuItem Header="Просмотр данных" Command="{Binding ViewAbonentWindow}"/>
                                     <MenuItem Header="Редактирование данных" Command="{Binding EditAbonentWindow}"/>
-                                    <MenuItem Header="Копировать данные" Command="{Binding CopyInfoAbonent}"/>
-                                    <MenuItem Header="Удалить Абонента" />
+                                    <MenuItem Header="Копирование данных" Command="{Binding CopyInfoAbonent}"/>
+                                    <MenuItem Header="Удаление Абонента" Command="{Binding DeleteAbonent}"/>
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
                             <DataGrid.Columns>
@@ -94,19 +94,26 @@
                                 <Label Content="{StaticResource SearchIcon}"/>
                                 <TextBox/>
                             </DockPanel>
-                            <DataGrid Margin="0 5 0 0" AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid Margin="0 5 0 0" AutoGenerateColumns="False" IsReadOnly="True" >
                                 <DataGrid.ItemsSource>
                                     <MultiBinding Converter="{StaticResource AbonentConverter}">
                                         <Binding Path="Abonents"/>
                                         <Binding Path="SelectedGroupName"/>
                                     </MultiBinding>
                                 </DataGrid.ItemsSource>
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Просмотр данных" Command="{Binding ViewAbonentWindow}"/>
+                                        <MenuItem Header="Редактирование данных" Command="{Binding EditAbonentWindow}"/>
+                                        <MenuItem Header="Копирование данных" Command="{Binding CopyInfoAbonent}"/>
+                                        <MenuItem Header="Удаление Абонента" Command="{Binding DeleteAbonent}"/>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Имя" Binding="{Binding Name}" Width="*"/>
                                     <DataGridTextColumn Header="Фамилия" Binding="{Binding Surname}" Width="*"/>
                                     <DataGridTextColumn Header="Дата рождения" Binding="{Binding DateOfBirth, StringFormat=dd.mm.yyyy}" Width="*"/>
                                     <DataGridTextColumn Header="Место положения" Binding="{Binding Residence, TargetNullValue=Отсутствует}" Width="*"/>
-                                    <DataGridTextColumn Header="Контактные данные" Binding="{Binding PhoneNumbers, Converter={StaticResource ConverterMain}}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
