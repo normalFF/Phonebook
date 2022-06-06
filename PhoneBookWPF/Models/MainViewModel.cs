@@ -1,7 +1,9 @@
 ﻿using LibraryOOP;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 
 namespace PhoneBookWPF.Models
 {
@@ -14,7 +16,8 @@ namespace PhoneBookWPF.Models
 
 	internal partial class MainViewModel : BaseViewModel
 	{
-		private readonly PhoneBook _phoneBook;
+		private string _fileWay;
+		private PhoneBook _phoneBook;
 		private IEnumerable<Abonent> _abonents;
 		private IEnumerable<string> _abonentsGroups;
 		private ObservableCollection<string> _phoneTypes;
@@ -62,13 +65,51 @@ namespace PhoneBookWPF.Models
 
 		public MainViewModel()
 		{
+			ModelInitialization();
+			CommandInitialization();
+		}
+
+		private void ModelInitialization()
+		{
 			_phoneBook = PhoneBook.GetPhoneBook();
-			GetData.GetListAbonents(_phoneBook, 20);
+			Abonents = _phoneBook.Abonents;
+			AbonentsGroups = _phoneBook.AbonentsGroup;
+			PhoneTypes = new ObservableCollection<string>(_phoneBook.PhoneType);
+			_saveFile = new()
+			{
+				Filter = "(*.json)|*.json",
+				CreatePrompt = true,
+				AddExtension = true
+			};
+			_openFile = new()
+			{
+				Filter = "(*.json)|*.json",
+				AddExtension = true
+			};
+		}
+
+		private void DataInitialization(string fileWay = null)
+		{
+			PhoneBook.DeletePhoneBook();
+			_phoneBook = PhoneBook.GetPhoneBook();
+
+			if (!string.IsNullOrEmpty(fileWay))
+			{
+				try
+				{
+					_phoneBook.LoadData(_fileWay);
+				}
+				catch (Exception ex)
+				{
+					string message = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+					MessageBox.Show($"Ошибка при открытии файла: \n\r{message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+			}
+
 			Abonents = _phoneBook.Abonents;
 			AbonentsGroups = _phoneBook.AbonentsGroup;
 			PhoneTypes = new ObservableCollection<string>(_phoneBook.PhoneType.ToList());
-
-			CommandInitialization();
 		}
 	}
 }
