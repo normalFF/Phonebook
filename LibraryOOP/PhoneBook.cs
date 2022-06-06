@@ -28,6 +28,7 @@ namespace LibraryOOP
 			_abonents = new();
 			_abonentsGroups = new();
 			_phoneType = new();
+			_saved = true;
 		}
 
 		public static PhoneBook GetPhoneBook()
@@ -57,12 +58,22 @@ namespace LibraryOOP
 
 		public void LoadData(string fileWay)
 		{
+			if (Path.GetExtension(fileWay) != ".json")
+			{
+				throw new NotSupportedException($"Файл {fileWay} не соответствует допустимому формату (.json)");
+			}
+
 			SerializedModelAbonent[] loadData;
 			string readResult;
 
 			using (StreamReader file = new(fileWay))
 			{
 				readResult = file.ReadToEnd();
+			}
+
+			if (string.IsNullOrEmpty(readResult))
+			{
+				return;
 			}
 
 			loadData = (SerializedModelAbonent[])JsonSerializer.Deserialize(
@@ -89,31 +100,39 @@ namespace LibraryOOP
 								i.Phones.Select(p => PhoneNumber.CreatePhoneNumber(p)).ToList()))
 						.ToList();
 
-			foreach (SerializedModelAbonent model in loadData)
+
+			List<IEnumerable<string>> groups = abonents.Where(t => t.Groups.Count() > 0).Select(t => t.Groups).ToList();
+			List<IEnumerable<PhoneNumber>> phoneTypes = abonents.Where(t => t.PhoneNumbers.Count() > 0).Select(t => t.PhoneNumbers).ToList();
+
+			List<string> abonentsGroups = groups.Count > 0 ? groups[0].ToList() : new List<string>();
+			_phoneType = new();
+
+			foreach (IEnumerable<string> item in groups)
 			{
-				if (model.Groups != null)
+				abonentsGroups = abonentsGroups.Union(item).ToList();
+			}
+			foreach (IEnumerable<PhoneNumber> item in phoneTypes)
+			{
+				foreach (PhoneNumber phone in item)
 				{
-					foreach (Abonent abonent in abonents)
+					if (!_phoneType.Contains(phone.Type))
 					{
-						if (string.Equals(abonent.Name, model.Name, StringComparison.OrdinalIgnoreCase)
-							&& string.Equals(abonent.Surname, model.Surname, StringComparison.OrdinalIgnoreCase)
-							&& string.Equals(abonent.Residence, model.Residence, StringComparison.OrdinalIgnoreCase)
-							&& Equals(abonent.DateOfBirth, model.DateOfBirth == null ? null : Convert.ToDateTime(model.DateOfBirth, DateTimeFormatInfo.CurrentInfo)))
-						{
-							foreach (string group in model.Groups)
-							{
-								AddAbonentsGroup(group, abonent);
-							}
-						}
+						_phoneType.Add(phone.Type);
 					}
 				}
 			}
 
+			_abonentsGroups = abonentsGroups;
 			_abonents = abonents;
 		}
 
 		public void SaveData(string fileWay)
 		{
+			if (Path.GetExtension(fileWay) != ".json")
+			{
+				throw new NotSupportedException($"Файл {fileWay} не соответствует допустимому формату (.json)");
+			}
+
 			SerializedModelAbonent[] serializeObject = Abonents.Select(i => new SerializedModelAbonent
 			{
 				Name = i.Name,
@@ -143,6 +162,8 @@ namespace LibraryOOP
 			{
 				file.Write(serializeResult);
 			}
+
+			_saved = true;
 		}
 
 		public static PhoneNumber CreatePhoneNumber(string phone, string phoneType)
